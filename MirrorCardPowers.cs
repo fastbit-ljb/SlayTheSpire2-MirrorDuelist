@@ -113,6 +113,10 @@ internal static class MirrorCardPowers
         {
         CardPowerTranslation.Model("BorrowedTimePower", "ExtraCost", PowerSide.Self),
         },
+        ["BOUNCINGFLASK"] = new CardPowerTranslation[]
+        {
+        CardPowerTranslation.Model("PoisonPower", "Poison", PowerSide.Target),
+        },
         ["BRAND"] = new CardPowerTranslation[]
         {
         CardPowerTranslation.Model("StrengthPower", "Strength", PowerSide.Self),
@@ -187,6 +191,10 @@ internal static class MirrorCardPowers
         {
         CardPowerTranslation.Model("CrueltyPower", "CrueltyPower", PowerSide.Self),
         },
+        ["CRUSHUNDER"] = new CardPowerTranslation[]
+        {
+        CardPowerTranslation.Model("CrushUnderPower", "StrengthLoss", PowerSide.Target),
+        },
         ["DANSEMACABRE"] = new CardPowerTranslation[]
         {
         CardPowerTranslation.Model("DanseMacabrePower", "DanseMacabrePower", PowerSide.Self),
@@ -245,9 +253,17 @@ internal static class MirrorCardPowers
         {
         CardPowerTranslation.Model("WeakPower", "Weak", PowerSide.Self),
         },
+        ["DYINGSTAR"] = new CardPowerTranslation[]
+        {
+        CardPowerTranslation.Model("DyingStarPower", "StrengthLoss", PowerSide.Target),
+        },
         ["ECHOFORM"] = new CardPowerTranslation[]
         {
         CardPowerTranslation.Model("EchoFormPower", "EchoForm", PowerSide.Self),
+        },
+        ["ENDOFDAYS"] = new CardPowerTranslation[]
+        {
+        CardPowerTranslation.Model("DoomPower", "Doom", PowerSide.Target),
         },
         ["ENFEEBLINGTOUCH"] = new CardPowerTranslation[]
         {
@@ -256,6 +272,10 @@ internal static class MirrorCardPowers
         ["ENVENOM"] = new CardPowerTranslation[]
         {
         CardPowerTranslation.Model("EnvenomPower", "EnvenomPower", PowerSide.Self),
+        },
+        ["ETERNALARMOR"] = new CardPowerTranslation[]
+        {
+        CardPowerTranslation.Model("PlatingPower", "PlatingPower", PowerSide.Self),
         },
         ["EXPOSE"] = new CardPowerTranslation[]
         {
@@ -399,6 +419,9 @@ internal static class MirrorCardPowers
         CardPowerTranslation.Model("StrengthPower", "ExpertiseStrength", PowerSide.Self),
         CardPowerTranslation.Model("DexterityPower", "ExpertiseDexterity", PowerSide.Self),
         CardPowerTranslation.Model("CuriousPower", "CuriousReduction", PowerSide.Self),
+        CardPowerTranslation.Model("WeakPower", "SappingWeak", PowerSide.Target),
+        CardPowerTranslation.Model("VulnerablePower", "SappingVulnerable", PowerSide.Target),
+        CardPowerTranslation.Model("StranglePower", "ChokingDamage", PowerSide.Target),
         },
         ["MALAISE"] = new CardPowerTranslation[]
         {
@@ -422,6 +445,10 @@ internal static class MirrorCardPowers
         {
         CardPowerTranslation.Model("MonarchsGazePower", "StrengthLoss", PowerSide.Self),
         },
+        ["NEGATIVEPULSE"] = new CardPowerTranslation[]
+        {
+        CardPowerTranslation.Model("DoomPower", "Doom", PowerSide.Target),
+        },
         ["NEUROSURGE"] = new CardPowerTranslation[]
         {
         CardPowerTranslation.Model("NeurosurgePower", "NeurosurgePower", PowerSide.Self),
@@ -429,6 +456,10 @@ internal static class MirrorCardPowers
         ["NEUTRALIZE"] = new CardPowerTranslation[]
         {
         CardPowerTranslation.Model("WeakPower", "Weak", PowerSide.Target),
+        },
+        ["NEUTRONAEGIS"] = new CardPowerTranslation[]
+        {
+        CardPowerTranslation.Model("PlatingPower", "PlatingPower", PowerSide.Self),
         },
         ["NOESCAPE"] = new CardPowerTranslation[]
         {
@@ -450,6 +481,10 @@ internal static class MirrorCardPowers
         {
         CardPowerTranslation.Model("OneTwoPunchPower", "Attacks", PowerSide.Self),
         },
+        ["OUTBREAK"] = new CardPowerTranslation[]
+        {
+        CardPowerTranslation.Model("PoisonPower", "Poison", PowerSide.Target),
+        },
         ["OUTMANEUVER"] = new CardPowerTranslation[]
         {
         CardPowerTranslation.Energy("Energy"),
@@ -465,6 +500,10 @@ internal static class MirrorCardPowers
         ["PATTER"] = new CardPowerTranslation[]
         {
         CardPowerTranslation.Model("VigorPower", "VigorPower", PowerSide.Self),
+        },
+        ["PIERCINGWAIL"] = new CardPowerTranslation[]
+        {
+        CardPowerTranslation.Model("PiercingWailPower", "StrengthLoss", PowerSide.Target),
         },
         ["PILLAROFCREATION"] = new CardPowerTranslation[]
         {
@@ -520,6 +559,7 @@ internal static class MirrorCardPowers
         ["RESONANCE"] = new CardPowerTranslation[]
         {
         CardPowerTranslation.Model("StrengthPower", null, PowerSide.Self),
+        CardPowerTranslation.Model("StrengthPower", null, PowerSide.Target),
         },
         ["RUPTURE"] = new CardPowerTranslation[]
         {
@@ -557,6 +597,11 @@ internal static class MirrorCardPowers
         {
         CardPowerTranslation.Model("StrengthPower", "PlayerStrengthLoss", PowerSide.Self),
         CardPowerTranslation.Model("StrengthPower", "EnemyStrengthLoss", PowerSide.Target),
+        },
+        ["SHOCKWAVE"] = new CardPowerTranslation[]
+        {
+        CardPowerTranslation.Model("WeakPower", null, PowerSide.Target),
+        CardPowerTranslation.Model("VulnerablePower", null, PowerSide.Target),
         },
         ["SHROUD"] = new CardPowerTranslation[]
         {
@@ -597,6 +642,10 @@ internal static class MirrorCardPowers
         ["SQUASH"] = new CardPowerTranslation[]
         {
         CardPowerTranslation.Model("VulnerablePower", "Vulnerable", PowerSide.Target),
+        },
+        ["STONEARMOR"] = new CardPowerTranslation[]
+        {
+        CardPowerTranslation.Model("PlatingPower", "PlatingPower", PowerSide.Self),
         },
         ["STRANGLE"] = new CardPowerTranslation[]
         {

@@ -757,6 +757,7 @@ public sealed class MirrorDuelist : MonsterModel
                     interpreted = true;
                 }
             }
+            interpreted |= await TrySpecialEffect(card, target, ctx, cardPlay);
             interpreted |= await ApplyTablePowers(card, target, ctx, cardPlay);
             if (vars.ContainsKey("Heal"))
             {
@@ -1093,6 +1094,97 @@ public sealed class MirrorDuelist : MonsterModel
             }
         }
         return applied;
+    }
+
+    /// <summary>
+    /// Bespoke translations for cards whose vanilla OnPlay does something the
+    /// data tables cannot express (dynamic amounts, hand sweeps, teammate
+    /// draws). Verified against each card's decompiled OnPlay; these ids are
+    /// excluded from the generated power table to avoid double application.
+    /// </summary>
+    private async Task<bool> TrySpecialEffect(CardModel card, Creature target, PlayerChoiceContext ctx, CardPlay cardPlay)
+    {
+        switch (NormalizedId(card))
+        {
+            case "BATTLETANCE":
+            {
+                int n = card.DynamicVars.ContainsKey("Cards") ? Math.Clamp(card.DynamicVars.Cards.IntValue, 1, 10) : 3;
+                DrawFromMirrorDrawIntoHand(n);
+                return true;
+            }
+            case "BULLETTIME":
+            {
+                CardPile? hand = MirrorPile(PileType.Hand);
+                if (hand == null)
+                {
+                    return false;
+                }
+                foreach (CardModel c in hand.Cards.ToList())
+                {
+                    if (!c.EnergyCost.CostsX)
+                    {
+                        c.SetToFreeThisTurn();
+                    }
+                }
+                return true;
+            }
+            case "ONEFORALL":
+            {
+                decimal amount = card.DynamicVars.ContainsKey("OneForAllPower") ? card.DynamicVars["OneForAllPower"].BaseValue : 1m;
+                PowerModel canonical = ModelDb.DebugPower(ResolvePowerModel("OneForAllPower")!);
+                await PowerCmd.Apply(ctx, canonical.ToMutable(), target, amount, Creature, card);
+                return true;
+            }
+            case "PLOT":
+            {
+                int n = card.DynamicVars.ContainsKey("Cards") ? Math.Clamp(card.DynamicVars.Cards.IntValue, 1, 5) : 1;
+                _pendingDrawBonus += n;
+                return true;
+            }
+            case "PROLONG":
+            {
+                _pendingBlockBonus += (int)Math.Clamp(Creature.Block, 0m, 999m);
+                return true;
+            }
+            default:
+                return false;
+        }
+    }
+
+    /// <summary>Moves up to n cards from the mirror draw pile into its hand
+    /// (no draw command: the mirror player has no hand UI). The turn's greedy
+    /// continuation plays them while energy remains.</summary>
+    private void DrawFromMirrorDrawIntoHand(int n)
+    {
+        CardPile? draw = MirrorPile(PileType.Draw);
+        CardPile? hand = MirrorPile(PileType.Hand);
+        if (draw == null || hand == null)
+        {
+            return;
+        }
+        while (n > 0 && draw.Cards.Count > 0)
+        {
+            if (draw.Cards.Count == 0 && MirrorPile(PileType.Discard) is { } discard && discard.Cards.Count > 0)
+            {
+                var shuffled = discard.Cards.ToList();
+                foreach (CardModel c in shuffled)
+                {
+                    discard.RemoveInternal(c);
+                }
+                ShuffleList(shuffled);
+                foreach (CardModel c in shuffled)
+                {
+                    draw.AddInternal(c);
+                }
+            }
+            CardModel top = draw.Cards[^1];
+            draw.RemoveInternal(top);
+            if (!hand.Cards.Contains(top))
+            {
+                hand.AddInternal(top);
+            }
+            n--;
+        }
     }
 
     private static readonly Dictionary<string, Type?> PowerModelTypes = new(StringComparer.Ordinal);

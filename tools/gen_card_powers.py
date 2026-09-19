@@ -39,6 +39,19 @@ EXCLUDED_POWERS = {
     "SummonNextTurnPower",   # Summon var path already exists
 }
 
+# Cards handled by bespoke code in MirrorDuelist.TrySpecialEffect instead of
+# table data (conditional amounts, free-hand sweeps, pending-economy forms).
+SPECIAL_CASES = {
+    "BattleTrance", "BulletTime", "OneForAll", "Plot", "Prolong",
+}
+
+# Powers cleared by the audit to apply even though the pattern scan flagged
+# them. Filled from agent review results.
+UNBANNED_POWERS: set[str] = {
+    "PlatingPower",  # audit: all hooks null-safe on monster owner (round-1
+                     # block, per-turn block, correct decrement)
+}
+
 # Player-only API access that would NRE when Owner is the duelist creature.
 UNSAFE_PATTERNS = [
     r"Owner\??\.Player\b(?!\s*(?:==|!=|is\b))",
@@ -107,21 +120,22 @@ def main() -> None:
             if len(args) < 3:
                 continue
             dest = args[1]
-            if "Osty" in dest:
+            low = dest.lower()
+            if "osty" in low:
                 continue
-            if "Owner" in dest:
+            if "owner" in low:
                 side = "Self"
-            elif "Hittable" in dest or "Enemies" in dest:
+            elif "hittable" in low or "enemies" in low or "enemy" in low:
                 side = "Target"
-            elif "Allies" in dest:
+            elif "allies" in low or "teammates" in low:
                 side = "Self"
-            elif "Target" in dest:
+            elif "target" in low:
                 side = "Target"
             else:
                 stats["skipped_dest"] += 1
                 continue
 
-            if power in EXCLUDED_POWERS:
+            if path.stem in SPECIAL_CASES or power in EXCLUDED_POWERS:
                 stats["excluded"] += 1
                 continue
             if power in SPECIAL_POWERS:
@@ -139,7 +153,7 @@ def main() -> None:
                     power_cache[power] = False
                 else:
                     ptext = pfile.read_text(encoding="utf-8")
-                    power_cache[power] = UNSAFE_RE.search(ptext) is None
+                    power_cache[power] = UNSAFE_RE.search(ptext) is None or power in UNBANNED_POWERS
             if not power_cache[power]:
                 stats["unsafe"] += 1
                 continue
