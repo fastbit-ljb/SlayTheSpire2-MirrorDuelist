@@ -1,0 +1,6 @@
+{
+  "MIRROR_STEAL.title": "偷取卡牌",
+  "MIRROR_STEAL.description": "从你的抽牌堆或弃牌堆中偷取三张牌。",
+  "MIRROR_PLAY_CARD.title": "打出偷来的牌",
+  "MIRROR_PLAY_CARD.description": "镜像决斗家将打出上方展示的偷来卡牌。"
+}

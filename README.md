@@ -1,0 +1,67 @@
+# Mirror Duelist (镜像决斗家)
+
+Slay the Spire 2 custom-enemy mod (test version). An Act 3 normal enemy that
+mirrors the player.
+
+## Behavior
+
+- Copies the played character's visuals (facing the player).
+- **HP = 1.5x** the player's max HP (x1.07 on Tough Enemies ascension).
+- Turn 1 steals **three real cards** from the player's draw/discard piles
+  (Thieving Hopper parity: the deck version is pulled out of the run deck too).
+  Weighted: attack > power > skill > curse, uncommon > common > rare; at most
+  one copy of each card.
+- Stolen cards hang above the duelist. Each turn it draws up to 5 and spends
+  **5 energy** playing them at the player through a UI-free interpreter:
+  - Attacks hit with printed damage/hit counts (incl. Shiv + Accuracy,
+    Unleash scaling off the mirrored Osty).
+  - Block skills grant it block; self HP-loss costs (Breakthrough) apply.
+  - **Power cards apply their real PowerModel** via a generated translation
+    table (`MirrorCardPowers.cs`, extracted from the vanilla card sources by
+    `tools/gen_card_powers.py`): Demon Form, Echo Form, Noxious Fumes, The
+    Bomb, Thorns... Powers whose hooks require a real player are audited out
+    (71 blacklisted) and resolve as harmless duds.
+  - Next-turn resource powers (energy/draw/block) feed the interpreter's own
+    pending economy for the following turn.
+  - Generated cards (Shivs, Discovery) are played by the duelist, never given
+    to the player; recursion is capped (depth 4, 12 per turn).
+  - Powers are single-use (exhaust), exhaust cards leave the pool, a pool down
+    to one card plays it twice, an empty pool falls back to Strikes.
+- `CombatState.HittableEnemies` is redirected to the player side during the
+  enemy turn of a duelist fight, so stolen AOE powers hit the player's team.
+- On death, every stolen card is offered back as a Special card reward
+  (vanilla SwipePower flow); skipping leaves it out of the run.
+- Appears once per run in one of Act 3's first three normal fights.
+
+## Testing (dev console)
+
+Press `` ` `` in-game:
+
+- `fight MIRROR_DUELIST_NORMAL` — fight it immediately.
+- `power STRENGTH_POWER 10 0` / `power STRENGTH_POWER -10 0` — pump/debuff
+  yourself while observing its output.
+
+## Project layout
+
+- `MirrorDuelist.cs` — the monster: stealing, pile-based turns, the UI-free
+  safe interpreter (no vanilla `OnPlay` invocation, so player-choice cards can
+  never deadlock the enemy turn), intents, the mirrored Osty summon.
+- `MirrorCardPowers.cs` — generated card→power translation table (do not edit
+  by hand; run `tools/gen_card_powers.py`).
+- `MirrorOstyGuardPower.cs` — hidden take-hits-for-the-duelist power (enemy-side
+  Osty without PetOwner, so the combat layout stays intact).
+- `MirrorPlayGate.cs` — the synthetic mirror player factory (owner of copied
+  cards and their private combat piles).
+- `ModInit.cs` — ModelDb.Inject registration fallback, Glory pool injection,
+  Act 3 placement, HittableEnemies redirect.
+- `MirrorIntentIcons.cs` + `assets/*.png` — embedded intent icons.
+- `tools/gen_card_powers.py` — regenerates `MirrorCardPowers.cs` from the
+  decompiled card sources (extraction + monster-owner safety audit).
+- `tools/build_pck.py` / `tools/pck_tool.py` — builds `MirrorDuelist.pck`
+  (localization only).
+
+## Status
+
+Test version (v0.4.0), installed locally, not on the Workshop yet. Known
+limitation: 71 player powers are untranslatable on a monster owner and play as
+duds; check the log for `resolved as a safe dud` lines.

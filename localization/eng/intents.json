@@ -1,0 +1,6 @@
+{
+  "MIRROR_STEAL.title": "Card Theft",
+  "MIRROR_STEAL.description": "Steals three cards from your draw or discard pile.",
+  "MIRROR_PLAY_CARD.title": "Play Stolen Card",
+  "MIRROR_PLAY_CARD.description": "The Mirror Duelist will play the displayed stolen card."
+}
