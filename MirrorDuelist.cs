@@ -1076,7 +1076,11 @@ public sealed class MirrorDuelist : MonsterModel
                     }
                     try
                     {
-                        var canonical = (PowerModel)Activator.CreateInstance(powerType)!;
+                        // Model ctors self-register in ModelDb, so never
+                        // Activator.CreateInstance a model: pull the canonical
+                        // instance and clone it, exactly like vanilla call
+                        // sites do.
+                        PowerModel canonical = ModelDb.DebugPower(powerType);
                         Creature dest = t.Side == PowerSide.Self ? Creature : target;
                         await PowerCmd.Apply(ctx, canonical.ToMutable(), dest, amount, Creature, card);
                         applied = true;
