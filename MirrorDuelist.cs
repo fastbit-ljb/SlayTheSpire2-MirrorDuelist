@@ -758,6 +758,7 @@ public sealed class MirrorDuelist : MonsterModel
                 }
             }
             interpreted |= await TrySpecialEffect(card, target, ctx, cardPlay);
+            interpreted |= await ApplyCardEffects(card, target, ctx, cardPlay);
             interpreted |= await ApplyTablePowers(card, target, ctx, cardPlay);
             if (vars.ContainsKey("Heal"))
             {
@@ -1036,6 +1037,158 @@ public sealed class MirrorDuelist : MonsterModel
     /// "Block" entries feed the interpreter's pending next-turn economy since
     /// those vanilla powers only make sense on a real player.
     /// </summary>
+    /// <summary>
+    /// Executes the data-driven effect table (MirrorCardEffects) filled from
+    /// the per-card source audit. Amounts resolve from the card's own vars
+    /// first, falling back to the stored constant.
+    /// </summary>
+    private async Task<bool> ApplyCardEffects(CardModel card, Creature target, PlayerChoiceContext ctx, CardPlay cardPlay)
+    {
+        if (!MirrorCardEffects.Table.TryGetValue(NormalizedId(card), out CardEffect[]? effects))
+        {
+            return false;
+        }
+        bool applied = false;
+        foreach (CardEffect effect in effects)
+        {
+            decimal amount = ResolveAmount(card, effect.VarKey, effect.Const);
+            switch (effect.Kind)
+            {
+                case "damage":
+                {
+                    if (amount <= 0m)
+                    {
+                        break;
+                    }
+                    bool isShiv = card.Tags.Contains(CardTag.Shiv);
+                    decimal clamped = Clamp(amount, isShiv ? 0m : DamageClampMin, DamageClampMax);
+                    await DamageCmd.Attack(clamped).WithHitCount(Math.Clamp(effect.Hits, 1, 8)).FromMonster(this)
+                        .WithAttackerAnim("Attack", 0.3f).WithAttackerFx(null, AttackSfxPath)
+                        .WithHitFx("vfx/vfx_attack_blunt").Execute(ctx);
+                    applied = true;
+                    break;
+                }
+                case "block":
+                    if (amount > 0m)
+                    {
+                        await CreatureCmd.GainBlock(Creature, Clamp(amount, 0m, 40m), ValueProp.Move, cardPlay);
+                        applied = true;
+                    }
+                    break;
+                case "power":
+                {
+                    Type? powerType = ResolvePowerModel(effect.Power);
+                    if (amount <= 0m || powerType == null)
+                    {
+                        break;
+                    }
+                    try
+                    {
+                        PowerModel canonical = ModelDb.DebugPower(powerType);
+                        Creature dest = effect.Side == EffectTarget.Self ? Creature : target;
+                        await PowerCmd.Apply(ctx, canonical.ToMutable(), dest, amount, Creature, card);
+                        applied = true;
+                    }
+                    catch (Exception e)
+                    {
+                        Log.Error($"[MirrorDuelist] effect power {effect.Power} failed for {card.Id.Entry}: {e}");
+                    }
+                    break;
+                }
+                case "heal":
+                    if (amount > 0m)
+                    {
+                        await CreatureCmd.Heal(Creature, amount);
+                        applied = true;
+                    }
+                    break;
+                case "hp_loss":
+                    if (amount > 0m)
+                    {
+                        await CreatureCmd.Damage(ctx, Creature, amount,
+                            ValueProp.Unblockable | ValueProp.Unpowered | ValueProp.Move, card, cardPlay);
+                        applied = true;
+                    }
+                    break;
+                case "draw_hand":
+                    if (amount > 0m)
+                    {
+                        DrawFromMirrorDrawIntoHand((int)amount);
+                        applied = true;
+                    }
+                    break;
+                case "add_status":
+                    await AddStatusCards(effect, card);
+                    applied = true;
+                    break;
+                case "shivs":
+                {
+                    int n = (int)Math.Clamp(amount, 1m, 6m);
+                    for (int i = 0; i < n; i++)
+                    {
+                        CardModel shiv = card.CombatState!.CreateCard<Shiv>(_mirrorPlayer!);
+                        await PlayGeneratedCard(shiv, target, makeFree: true);
+                    }
+                    applied = true;
+                    break;
+                }
+            }
+        }
+        return applied;
+    }
+
+    private static decimal ResolveAmount(CardModel card, string? varKey, decimal constValue)
+    {
+        if (varKey != null && card.DynamicVars.ContainsKey(varKey))
+        {
+            return card.DynamicVars[varKey].BaseValue;
+        }
+        return constValue;
+    }
+
+    /// <summary>Creates n copies of a status card and files them into the
+    /// duelist's own discard/draw, or the real player's discard for
+    /// side-inverted "shuffle statuses into the enemy's pile" effects.</summary>
+    private async Task AddStatusCards(CardEffect effect, CardModel source)
+    {
+        if (_mirrorPlayer == null || effect.Status == null || source.CombatState == null)
+        {
+            return;
+        }
+        CardModel? canonical = ModelDb.GetByIdOrNull<CardModel>(new ModelId("CARD", Slug(effect.Status)));
+        if (canonical == null)
+        {
+            Log.Error($"[MirrorDuelist] unknown status card {effect.Status}");
+            return;
+        }
+        Player? realPlayer = CurrentPlayer();
+        CardPile? pile = effect.Pile switch
+        {
+            "own_draw" => MirrorPile(PileType.Draw),
+            "target_discard" => realPlayer != null ? PileType.Discard.GetPile(realPlayer) : null,
+            _ => MirrorPile(PileType.Discard),
+        };
+        if (pile == null)
+        {
+            return;
+        }
+        for (int i = 0; i < Math.Clamp((int)effect.Const, 1m, 6m); i++)
+        {
+            CardModel status = canonical.CreateDupe(_mirrorPlayer);
+            if (!pile.Cards.Contains(status))
+            {
+                await CardPileCmd.Add(status, pile, skipVisuals: true);
+            }
+        }
+    }
+
+    /// <summary>Mirrors StringHelper.Slugify for PascalCase class names.</summary>
+    private static string Slug(string name)
+    {
+        string withUnderscores = System.Text.RegularExpressions.Regex.Replace(name.Trim(), "([A-Za-z0-9])([A-Z])", "$1_$2");
+        return System.Text.RegularExpressions.Regex.Replace(withUnderscores.ToUpperInvariant(), @"[^A-Z0-9_]", "");
+    }
+
     private async Task<bool> ApplyTablePowers(CardModel card, Creature target, PlayerChoiceContext ctx, CardPlay cardPlay)
     {
         if (!MirrorCardPowers.Table.TryGetValue(NormalizedId(card), out CardPowerTranslation[]? translations))
