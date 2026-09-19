@@ -389,6 +389,10 @@ internal static class MirrorCardPowers
         {
         CardPowerTranslation.Model("HyperbeamFocusDownPower", "FocusPower", PowerSide.Self),
         },
+        ["INFERNO"] = new CardPowerTranslation[]
+        {
+        CardPowerTranslation.Model("InfernoPower", "InfernoPower", PowerSide.Self),
+        },
         ["INFLAME"] = new CardPowerTranslation[]
         {
         CardPowerTranslation.Model("StrengthPower", "StrengthPower", PowerSide.Self),
@@ -413,6 +417,10 @@ internal static class MirrorCardPowers
         ["LEGSWEEP"] = new CardPowerTranslation[]
         {
         CardPowerTranslation.Model("WeakPower", "Weak", PowerSide.Target),
+        },
+        ["LETHALITY"] = new CardPowerTranslation[]
+        {
+        CardPowerTranslation.Model("LethalityPower", "LethalityPower", PowerSide.Self),
         },
         ["MADSCIENCE"] = new CardPowerTranslation[]
         {

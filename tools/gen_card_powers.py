@@ -50,6 +50,11 @@ SPECIAL_CASES = {
 UNBANNED_POWERS: set[str] = {
     "PlatingPower",  # audit: all hooks null-safe on monster owner (round-1
                      # block, per-turn block, correct decrement)
+    "InfernoPower",  # audit: AfterDamageReceived null-safe, functional with
+                     # the HittableEnemies redirect; turn-start hook is a
+                     # gated no-op
+    "LethalityPower",  # audit: ModifyDamageMultiplicative passes its gate for
+                       # duelist attacks (card owner's Creature == duelist)
 }
 
 # Player-only API access that would NRE when Owner is the duelist creature.
