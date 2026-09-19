@@ -1288,6 +1288,10 @@ public sealed class MirrorDuelist : MonsterModel
         {
             try { return Math.Clamp((int)calculated.Calculate(target), 1, 8); } catch { return 1; }
         }
+        if (MirrorHitCounts.TryGet(NormalizedId(card), out int fixedHits))
+        {
+            return Math.Clamp(fixedHits, 1, 8);
+        }
         string id = NormalizedId(card);
         return FixedDoubleHitCards.Contains(id) ? 2 : 1;
     }

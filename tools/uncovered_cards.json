@@ -1,0 +1,1967 @@
+[
+ {
+  "id": "ABUNDANCE",
+  "file": "Abundance",
+  "type": "Skill",
+  "reasons": [
+   "UI_SELECT",
+   "CREATES_CARDS",
+   "RUN_LEVEL"
+  ],
+  "onplay_len": 627
+ },
+ {
+  "id": "ACROBATICS",
+  "file": "Acrobatics",
+  "type": "Skill",
+  "reasons": [
+   "UI_SELECT"
+  ],
+  "onplay_len": 364
+ },
+ {
+  "id": "ADRENALINE",
+  "file": "Adrenaline",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 287
+ },
+ {
+  "id": "AFTERLIFE",
+  "file": "Afterlife",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 271
+ },
+ {
+  "id": "AGGRESSION",
+  "file": "Aggression",
+  "type": "Power",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 214
+ },
+ {
+  "id": "ALCHEMIZE",
+  "file": "Alchemize",
+  "type": "Skill",
+  "reasons": [
+   "POTION",
+   "RUN_LEVEL"
+  ],
+  "onplay_len": 258
+ },
+ {
+  "id": "ALIGNMENT",
+  "file": "Alignment",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 176
+ },
+ {
+  "id": "ANOINTED",
+  "file": "Anointed",
+  "type": "Skill",
+  "reasons": [
+   "RUN_LEVEL"
+  ],
+  "onplay_len": 327
+ },
+ {
+  "id": "APOTHEOSIS",
+  "file": "Apotheosis",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 198
+ },
+ {
+  "id": "ASCENDERSBANE",
+  "file": "AscendersBane",
+  "type": "Curse",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 0
+ },
+ {
+  "id": "AUTOMATION",
+  "file": "Automation",
+  "type": "Power",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 140
+ },
+ {
+  "id": "BADLUCK",
+  "file": "BadLuck",
+  "type": "Curse",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 0
+ },
+ {
+  "id": "BATTLETRANCE",
+  "file": "BattleTrance",
+  "type": "Skill",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 193
+ },
+ {
+  "id": "BEATDOWN",
+  "file": "BeatDown",
+  "type": "Skill",
+  "reasons": [
+   "RUN_LEVEL"
+  ],
+  "onplay_len": 734
+ },
+ {
+  "id": "BEGONE",
+  "file": "Begone",
+  "type": "Skill",
+  "reasons": [
+   "UI_SELECT",
+   "CREATES_CARDS"
+  ],
+  "onplay_len": 456
+ },
+ {
+  "id": "BELIEVEINYOU",
+  "file": "BelieveInYou",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 163
+ },
+ {
+  "id": "BIGBANG",
+  "file": "BigBang",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 413
+ },
+ {
+  "id": "BLACKHOLE",
+  "file": "BlackHole",
+  "type": "Power",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 255
+ },
+ {
+  "id": "BLADEDANCE",
+  "file": "BladeDance",
+  "type": "Skill",
+  "reasons": [
+   "CREATES_CARDS"
+  ],
+  "onplay_len": 251
+ },
+ {
+  "id": "BLADEOFINK",
+  "file": "BladeOfInk",
+  "type": "Skill",
+  "reasons": [
+   "CREATES_CARDS"
+  ],
+  "onplay_len": 163
+ },
+ {
+  "id": "BLADESYMPHONY",
+  "file": "BladeSymphony",
+  "type": "Skill",
+  "reasons": [
+   "CREATES_CARDS"
+  ],
+  "onplay_len": 523
+ },
+ {
+  "id": "BLOODLETTING",
+  "file": "Bloodletting",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 431
+ },
+ {
+  "id": "BODYGUARD",
+  "file": "Bodyguard",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 271
+ },
+ {
+  "id": "BRIGHTESTFLAME",
+  "file": "BrightestFlame",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 284
+ },
+ {
+  "id": "BULLETTIME",
+  "file": "BulletTime",
+  "type": "Skill",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 354
+ },
+ {
+  "id": "BUNDLEOFJOY",
+  "file": "BundleOfJoy",
+  "type": "Skill",
+  "reasons": [
+   "CREATES_CARDS",
+   "RUN_LEVEL"
+  ],
+  "onplay_len": 429
+ },
+ {
+  "id": "BURNINGPACT",
+  "file": "BurningPact",
+  "type": "Skill",
+  "reasons": [
+   "UI_SELECT"
+  ],
+  "onplay_len": 492
+ },
+ {
+  "id": "CACOPHONY",
+  "file": "Cacophony",
+  "type": "Power",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 139
+ },
+ {
+  "id": "CALAMITY",
+  "file": "Calamity",
+  "type": "Power",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 108
+ },
+ {
+  "id": "CALCULATEDGAMBLE",
+  "file": "CalculatedGamble",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 178
+ },
+ {
+  "id": "CALLOFTHEVOID",
+  "file": "CallOfTheVoid",
+  "type": "Power",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 247
+ },
+ {
+  "id": "CAPACITOR",
+  "file": "Capacitor",
+  "type": "Power",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 177
+ },
+ {
+  "id": "CAPTURESPIRIT",
+  "file": "CaptureSpirit",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 514
+ },
+ {
+  "id": "CASCADE",
+  "file": "Cascade",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 195
+ },
+ {
+  "id": "CATASTROPHE",
+  "file": "Catastrophe",
+  "type": "Skill",
+  "reasons": [
+   "RUN_LEVEL"
+  ],
+  "onplay_len": 545
+ },
+ {
+  "id": "CHAOS",
+  "file": "Chaos",
+  "type": "Skill",
+  "reasons": [
+   "RUN_LEVEL"
+  ],
+  "onplay_len": 301
+ },
+ {
+  "id": "CHARGE",
+  "file": "Charge",
+  "type": "Skill",
+  "reasons": [
+   "UI_SELECT"
+  ],
+  "onplay_len": 598
+ },
+ {
+  "id": "CHILDOFTHESTARS",
+  "file": "ChildOfTheStars",
+  "type": "Power",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 260
+ },
+ {
+  "id": "CHILL",
+  "file": "Chill",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 306
+ },
+ {
+  "id": "CLEANSE",
+  "file": "Cleanse",
+  "type": "Skill",
+  "reasons": [
+   "UI_SELECT"
+  ],
+  "onplay_len": 565
+ },
+ {
+  "id": "CLUMSY",
+  "file": "Clumsy",
+  "type": "Curse",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 0
+ },
+ {
+  "id": "CONSUMINGSHADOW",
+  "file": "ConsumingShadow",
+  "type": "Power",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 397
+ },
+ {
+  "id": "COOLANT",
+  "file": "Coolant",
+  "type": "Power",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 251
+ },
+ {
+  "id": "COOLHEADED",
+  "file": "Coolheaded",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 248
+ },
+ {
+  "id": "COUNTDOWN",
+  "file": "Countdown",
+  "type": "Power",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 255
+ },
+ {
+  "id": "CREATIVEAI",
+  "file": "CreativeAi",
+  "type": "Power",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 252
+ },
+ {
+  "id": "CRIMSONMANTLE",
+  "file": "CrimsonMantle",
+  "type": "Power",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 337
+ },
+ {
+  "id": "CURSEOFTHEBELL",
+  "file": "CurseOfTheBell",
+  "type": "Curse",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 0
+ },
+ {
+  "id": "DARKEMBRACE",
+  "file": "DarkEmbrace",
+  "type": "Power",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 215
+ },
+ {
+  "id": "DARKNESS",
+  "file": "Darkness",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 499
+ },
+ {
+  "id": "DEBT",
+  "file": "Debt",
+  "type": "Curse",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 0
+ },
+ {
+  "id": "DECAY",
+  "file": "Decay",
+  "type": "Curse",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 0
+ },
+ {
+  "id": "DECISIONSDECISIONS",
+  "file": "DecisionsDecisions",
+  "type": "Skill",
+  "reasons": [
+   "UI_SELECT"
+  ],
+  "onplay_len": 664
+ },
+ {
+  "id": "DEMESNE",
+  "file": "Demesne",
+  "type": "Power",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 241
+ },
+ {
+  "id": "DEMONICSHIELD",
+  "file": "DemonicShield",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 488
+ },
+ {
+  "id": "DIRGE",
+  "file": "Dirge",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 586
+ },
+ {
+  "id": "DISCOVERY",
+  "file": "Discovery",
+  "type": "Skill",
+  "reasons": [
+   "UI_SELECT",
+   "CREATES_CARDS",
+   "RUN_LEVEL"
+  ],
+  "onplay_len": 624
+ },
+ {
+  "id": "DISTRACTION",
+  "file": "Distraction",
+  "type": "Skill",
+  "reasons": [
+   "CREATES_CARDS",
+   "RUN_LEVEL"
+  ],
+  "onplay_len": 465
+ },
+ {
+  "id": "DOUBLEENERGY",
+  "file": "DoubleEnergy",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 185
+ },
+ {
+  "id": "DREDGE",
+  "file": "Dredge",
+  "type": "Skill",
+  "reasons": [
+   "UI_SELECT"
+  ],
+  "onplay_len": 449
+ },
+ {
+  "id": "DRUMOFBATTLE",
+  "file": "DrumOfBattle",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 89
+ },
+ {
+  "id": "DUALCAST",
+  "file": "Dualcast",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 337
+ },
+ {
+  "id": "DUALWIELD",
+  "file": "DualWield",
+  "type": "Skill",
+  "reasons": [
+   "UI_SELECT"
+  ],
+  "onplay_len": 569
+ },
+ {
+  "id": "ECHOINGSLASH",
+  "file": "EchoingSlash",
+  "type": "Attack",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 496
+ },
+ {
+  "id": "EIDOLON",
+  "file": "Eidolon",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 393
+ },
+ {
+  "id": "ENERGYSURGE",
+  "file": "EnergySurge",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 391
+ },
+ {
+  "id": "ENLIGHTENMENT",
+  "file": "Enlightenment",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 284
+ },
+ {
+  "id": "ENTHRALLED",
+  "file": "Enthralled",
+  "type": "Curse",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 0
+ },
+ {
+  "id": "ENTRENCH",
+  "file": "Entrench",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 129
+ },
+ {
+  "id": "ENTROPY",
+  "file": "Entropy",
+  "type": "Power",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 136
+ },
+ {
+  "id": "ETERNALARMOR",
+  "file": "EternalArmor",
+  "type": "Power",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 146
+ },
+ {
+  "id": "EXPECTAFIGHT",
+  "file": "ExpectAFight",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 263
+ },
+ {
+  "id": "EXPERTISE",
+  "file": "Expertise",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 163
+ },
+ {
+  "id": "FERAL",
+  "file": "Feral",
+  "type": "Power",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 247
+ },
+ {
+  "id": "FETCH",
+  "file": "Fetch",
+  "type": "Attack",
+  "reasons": [
+   "ATTACK_CUSTOM_DMG"
+  ],
+  "onplay_len": 487
+ },
+ {
+  "id": "FLATTEN",
+  "file": "Flatten",
+  "type": "Attack",
+  "reasons": [
+   "ATTACK_CUSTOM_DMG"
+  ],
+  "onplay_len": 357
+ },
+ {
+  "id": "FOLLY",
+  "file": "Folly",
+  "type": "Curse",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 0
+ },
+ {
+  "id": "FORBIDDENGRIMOIRE",
+  "file": "ForbiddenGrimoire",
+  "type": "Power",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 221
+ },
+ {
+  "id": "FOREGONECONCLUSION",
+  "file": "ForegoneConclusion",
+  "type": "Skill",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 246
+ },
+ {
+  "id": "FORGOTTENRITUAL",
+  "file": "ForgottenRitual",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 328
+ },
+ {
+  "id": "FUEL",
+  "file": "Fuel",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 79
+ },
+ {
+  "id": "FURNACE",
+  "file": "Furnace",
+  "type": "Power",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 241
+ },
+ {
+  "id": "FUSION",
+  "file": "Fusion",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 162
+ },
+ {
+  "id": "GENESIS",
+  "file": "Genesis",
+  "type": "Power",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 251
+ },
+ {
+  "id": "GLIMMER",
+  "file": "Glimmer",
+  "type": "Skill",
+  "reasons": [
+   "UI_SELECT"
+  ],
+  "onplay_len": 424
+ },
+ {
+  "id": "GLIMPSEBEYOND",
+  "file": "GlimpseBeyond",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 660
+ },
+ {
+  "id": "GREED",
+  "file": "Greed",
+  "type": "Curse",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 0
+ },
+ {
+  "id": "GUARDS",
+  "file": "Guards",
+  "type": "Skill",
+  "reasons": [
+   "UI_SELECT",
+   "CREATES_CARDS"
+  ],
+  "onplay_len": 547
+ },
+ {
+  "id": "GUILTY",
+  "file": "Guilty",
+  "type": "Curse",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 0
+ },
+ {
+  "id": "HAILSTORM",
+  "file": "Hailstorm",
+  "type": "Power",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 255
+ },
+ {
+  "id": "HAMMERTIME",
+  "file": "HammerTime",
+  "type": "Power",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 214
+ },
+ {
+  "id": "HAUNT",
+  "file": "Haunt",
+  "type": "Power",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 240
+ },
+ {
+  "id": "HAVOC",
+  "file": "Havoc",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 116
+ },
+ {
+  "id": "HELLOWORLD",
+  "file": "HelloWorld",
+  "type": "Power",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 214
+ },
+ {
+  "id": "HIDDENCACHE",
+  "file": "HiddenCache",
+  "type": "Skill",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 330
+ },
+ {
+  "id": "HIDDENDAGGERS",
+  "file": "HiddenDaggers",
+  "type": "Skill",
+  "reasons": [
+   "UI_SELECT",
+   "CREATES_CARDS"
+  ],
+  "onplay_len": 506
+ },
+ {
+  "id": "HIDDENGEM",
+  "file": "HiddenGem",
+  "type": "Skill",
+  "reasons": [
+   "RUN_LEVEL"
+  ],
+  "onplay_len": 972
+ },
+ {
+  "id": "HUDDLEUP",
+  "file": "HuddleUp",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 333
+ },
+ {
+  "id": "IGNITION",
+  "file": "Ignition",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 247
+ },
+ {
+  "id": "IMITATIONLEARNING",
+  "file": "ImitationLearning",
+  "type": "Skill",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 877
+ },
+ {
+  "id": "IMPATIENCE",
+  "file": "Impatience",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 194
+ },
+ {
+  "id": "INFERNALBLADE",
+  "file": "InfernalBlade",
+  "type": "Skill",
+  "reasons": [
+   "CREATES_CARDS",
+   "RUN_LEVEL"
+  ],
+  "onplay_len": 466
+ },
+ {
+  "id": "INFERNO",
+  "file": "Inferno",
+  "type": "Power",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 276
+ },
+ {
+  "id": "INFINITEBLADES",
+  "file": "InfiniteBlades",
+  "type": "Power",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 218
+ },
+ {
+  "id": "INJURY",
+  "file": "Injury",
+  "type": "Curse",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 0
+ },
+ {
+  "id": "ITERATION",
+  "file": "Iteration",
+  "type": "Power",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 255
+ },
+ {
+  "id": "JACKOFALLTRADES",
+  "file": "JackOfAllTrades",
+  "type": "Skill",
+  "reasons": [
+   "CREATES_CARDS",
+   "RUN_LEVEL"
+  ],
+  "onplay_len": 499
+ },
+ {
+  "id": "JUGGERNAUT",
+  "file": "Juggernaut",
+  "type": "Power",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 257
+ },
+ {
+  "id": "JUGGLING",
+  "file": "Juggling",
+  "type": "Power",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 212
+ },
+ {
+  "id": "KNIFETRAP",
+  "file": "KnifeTrap",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 505
+ },
+ {
+  "id": "LARGESSE",
+  "file": "Largesse",
+  "type": "Skill",
+  "reasons": [
+   "CREATES_CARDS",
+   "RUN_LEVEL"
+  ],
+  "onplay_len": 656
+ },
+ {
+  "id": "LEGIONOFBONE",
+  "file": "LegionOfBone",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 444
+ },
+ {
+  "id": "LETHALITY",
+  "file": "Lethality",
+  "type": "Power",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 255
+ },
+ {
+  "id": "LOOP",
+  "file": "Loop",
+  "type": "Power",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 240
+ },
+ {
+  "id": "LUMINESCE",
+  "file": "Luminesce",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 177
+ },
+ {
+  "id": "MACHINELEARNING",
+  "file": "MachineLearning",
+  "type": "Power",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 249
+ },
+ {
+  "id": "MASTEROFSTRATEGY",
+  "file": "MasterOfStrategy",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 89
+ },
+ {
+  "id": "MASTERPLANNER",
+  "file": "MasterPlanner",
+  "type": "Power",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 217
+ },
+ {
+  "id": "MAYHEM",
+  "file": "Mayhem",
+  "type": "Power",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 106
+ },
+ {
+  "id": "METAMORPHOSIS",
+  "file": "Metamorphosis",
+  "type": "Skill",
+  "reasons": [
+   "CREATES_CARDS",
+   "RUN_LEVEL"
+  ],
+  "onplay_len": 544
+ },
+ {
+  "id": "MIMIC",
+  "file": "Mimic",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 238
+ },
+ {
+  "id": "MIRAGE",
+  "file": "Mirage",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 165
+ },
+ {
+  "id": "MODDED",
+  "file": "Modded",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 300
+ },
+ {
+  "id": "MONOLOGUE",
+  "file": "Monologue",
+  "type": "Skill",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 365
+ },
+ {
+  "id": "MULTICAST",
+  "file": "MultiCast",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 338
+ },
+ {
+  "id": "NECROMASTERY",
+  "file": "NecroMastery",
+  "type": "Power",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 308
+ },
+ {
+  "id": "NEUTRONAEGIS",
+  "file": "NeutronAegis",
+  "type": "Power",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 147
+ },
+ {
+  "id": "NIGHTMARE",
+  "file": "Nightmare",
+  "type": "Skill",
+  "reasons": [
+   "UI_SELECT"
+  ],
+  "onplay_len": 903
+ },
+ {
+  "id": "NORMALITY",
+  "file": "Normality",
+  "type": "Curse",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 0
+ },
+ {
+  "id": "NOSTALGIA",
+  "file": "Nostalgia",
+  "type": "Power",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 109
+ },
+ {
+  "id": "OFFERING",
+  "file": "Offering",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 342
+ },
+ {
+  "id": "OMNISLICE",
+  "file": "Omnislice",
+  "type": "Attack",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 981
+ },
+ {
+  "id": "ONEFORALL",
+  "file": "OneForAll",
+  "type": "Power",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 333
+ },
+ {
+  "id": "ORBIT",
+  "file": "Orbit",
+  "type": "Power",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 240
+ },
+ {
+  "id": "OVERCLOCK",
+  "file": "Overclock",
+  "type": "Skill",
+  "reasons": [
+   "CREATES_CARDS"
+  ],
+  "onplay_len": 553
+ },
+ {
+  "id": "PAGESTORM",
+  "file": "Pagestorm",
+  "type": "Power",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 243
+ },
+ {
+  "id": "PALEBLUEDOT",
+  "file": "PaleBlueDot",
+  "type": "Power",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 245
+ },
+ {
+  "id": "PANACHE",
+  "file": "Panache",
+  "type": "Power",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 148
+ },
+ {
+  "id": "PARSE",
+  "file": "Parse",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 88
+ },
+ {
+  "id": "PHANTOMBLADES",
+  "file": "PhantomBlades",
+  "type": "Power",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 263
+ },
+ {
+  "id": "PIERCINGWAIL",
+  "file": "PiercingWail",
+  "type": "Skill",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 324
+ },
+ {
+  "id": "PLOT",
+  "file": "Plot",
+  "type": "Skill",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 340
+ },
+ {
+  "id": "POKE",
+  "file": "Poke",
+  "type": "Attack",
+  "reasons": [
+   "ATTACK_CUSTOM_DMG"
+  ],
+  "onplay_len": 400
+ },
+ {
+  "id": "POORSLEEP",
+  "file": "PoorSleep",
+  "type": "Curse",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 0
+ },
+ {
+  "id": "PREPARED",
+  "file": "Prepared",
+  "type": "Skill",
+  "reasons": [
+   "UI_SELECT"
+  ],
+  "onplay_len": 312
+ },
+ {
+  "id": "PRIMALFORCE",
+  "file": "PrimalForce",
+  "type": "Skill",
+  "reasons": [
+   "CREATES_CARDS"
+  ],
+  "onplay_len": 490
+ },
+ {
+  "id": "PRODUCTION",
+  "file": "Production",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 79
+ },
+ {
+  "id": "PROLONG",
+  "file": "Prolong",
+  "type": "Skill",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 146
+ },
+ {
+  "id": "PROPHESIZE",
+  "file": "Prophesize",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 189
+ },
+ {
+  "id": "PURITY",
+  "file": "Purity",
+  "type": "Skill",
+  "reasons": [
+   "UI_SELECT"
+  ],
+  "onplay_len": 282
+ },
+ {
+  "id": "PYRE",
+  "file": "Pyre",
+  "type": "Power",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 135
+ },
+ {
+  "id": "QUADCAST",
+  "file": "Quadcast",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 452
+ },
+ {
+  "id": "QUASAR",
+  "file": "Quasar",
+  "type": "Skill",
+  "reasons": [
+   "UI_SELECT",
+   "CREATES_CARDS",
+   "RUN_LEVEL"
+  ],
+  "onplay_len": 586
+ },
+ {
+  "id": "RAGE",
+  "file": "Rage",
+  "type": "Skill",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 235
+ },
+ {
+  "id": "RAINBOW",
+  "file": "Rainbow",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 286
+ },
+ {
+  "id": "REANIMATE",
+  "file": "Reanimate",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 271
+ },
+ {
+  "id": "REBOOT",
+  "file": "Reboot",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 377
+ },
+ {
+  "id": "REFLEX",
+  "file": "Reflex",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 189
+ },
+ {
+  "id": "REGRET",
+  "file": "Regret",
+  "type": "Curse",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 0
+ },
+ {
+  "id": "RESTLESSNESS",
+  "file": "Restlessness",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 237
+ },
+ {
+  "id": "RIGHTHANDHAND",
+  "file": "RightHandHand",
+  "type": "Attack",
+  "reasons": [
+   "ATTACK_CUSTOM_DMG"
+  ],
+  "onplay_len": 357
+ },
+ {
+  "id": "ROLLINGBOULDER",
+  "file": "RollingBoulder",
+  "type": "Power",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 160
+ },
+ {
+  "id": "ROYALGAMBLE",
+  "file": "RoyalGamble",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 177
+ },
+ {
+  "id": "ROYALTIES",
+  "file": "Royalties",
+  "type": "Power",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 242
+ },
+ {
+  "id": "SACRIFICE",
+  "file": "Sacrifice",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 397
+ },
+ {
+  "id": "SCRAWL",
+  "file": "Scrawl",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 145
+ },
+ {
+  "id": "SEANCE",
+  "file": "Seance",
+  "type": "Skill",
+  "reasons": [
+   "UI_SELECT"
+  ],
+  "onplay_len": 429
+ },
+ {
+  "id": "SECRETTECHNIQUE",
+  "file": "SecretTechnique",
+  "type": "Skill",
+  "reasons": [
+   "UI_SELECT"
+  ],
+  "onplay_len": 363
+ },
+ {
+  "id": "SECRETWEAPON",
+  "file": "SecretWeapon",
+  "type": "Skill",
+  "reasons": [
+   "UI_SELECT"
+  ],
+  "onplay_len": 364
+ },
+ {
+  "id": "SENTRYMODE",
+  "file": "SentryMode",
+  "type": "Power",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 257
+ },
+ {
+  "id": "SERPENTFORM",
+  "file": "SerpentForm",
+  "type": "Power",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 259
+ },
+ {
+  "id": "SKIM",
+  "file": "Skim",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 89
+ },
+ {
+  "id": "SNAP",
+  "file": "Snap",
+  "type": "Attack",
+  "reasons": [
+   "ATTACK_CUSTOM_DMG",
+   "UI_SELECT"
+  ],
+  "onplay_len": 705
+ },
+ {
+  "id": "SOUL",
+  "file": "Soul",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 89
+ },
+ {
+  "id": "SOULBOUND",
+  "file": "Soulbound",
+  "type": "Power",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 394
+ },
+ {
+  "id": "SPECTRUMSHIFT",
+  "file": "SpectrumShift",
+  "type": "Power",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 247
+ },
+ {
+  "id": "SPINNER",
+  "file": "Spinner",
+  "type": "Power",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 364
+ },
+ {
+  "id": "SPIRITOFASH",
+  "file": "SpiritOfAsh",
+  "type": "Power",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 257
+ },
+ {
+  "id": "SPLASH",
+  "file": "Splash",
+  "type": "Skill",
+  "reasons": [
+   "UI_SELECT",
+   "CREATES_CARDS",
+   "RUN_LEVEL"
+  ],
+  "onplay_len": 1077
+ },
+ {
+  "id": "SPOILSOFBATTLE",
+  "file": "SpoilsOfBattle",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 164
+ },
+ {
+  "id": "SPOREMIND",
+  "file": "SporeMind",
+  "type": "Curse",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 0
+ },
+ {
+  "id": "STACK",
+  "file": "Stack",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 165
+ },
+ {
+  "id": "STAMPEDE",
+  "file": "Stampede",
+  "type": "Power",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 141
+ },
+ {
+  "id": "STOKE",
+  "file": "Stoke",
+  "type": "Skill",
+  "reasons": [
+   "CREATES_CARDS",
+   "RUN_LEVEL"
+  ],
+  "onplay_len": 712
+ },
+ {
+  "id": "STONEARMOR",
+  "file": "StoneArmor",
+  "type": "Power",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 147
+ },
+ {
+  "id": "STORM",
+  "file": "Storm",
+  "type": "Power",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 247
+ },
+ {
+  "id": "STORMOFSTEEL",
+  "file": "StormOfSteel",
+  "type": "Skill",
+  "reasons": [
+   "CREATES_CARDS"
+  ],
+  "onplay_len": 443
+ },
+ {
+  "id": "STRATAGEM",
+  "file": "Stratagem",
+  "type": "Power",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 109
+ },
+ {
+  "id": "SUBROUTINE",
+  "file": "Subroutine",
+  "type": "Power",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 214
+ },
+ {
+  "id": "SUMMONFORTH",
+  "file": "SummonForth",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 448
+ },
+ {
+  "id": "SUPERCRITICAL",
+  "file": "Supercritical",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 182
+ },
+ {
+  "id": "SWEEPINGGAZE",
+  "file": "SweepingGaze",
+  "type": "Attack",
+  "reasons": [
+   "ATTACK_CUSTOM_DMG"
+  ],
+  "onplay_len": 300
+ },
+ {
+  "id": "SWORDSAGE",
+  "file": "SwordSage",
+  "type": "Power",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 255
+ },
+ {
+  "id": "TACTICIAN",
+  "file": "Tactician",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 78
+ },
+ {
+  "id": "TEMPEST",
+  "file": "Tempest",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 300
+ },
+ {
+  "id": "THESEALEDTHRONE",
+  "file": "TheSealedThrone",
+  "type": "Power",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 219
+ },
+ {
+  "id": "THESMITH",
+  "file": "TheSmith",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 175
+ },
+ {
+  "id": "THINKINGAHEAD",
+  "file": "ThinkingAhead",
+  "type": "Skill",
+  "reasons": [
+   "UI_SELECT"
+  ],
+  "onplay_len": 402
+ },
+ {
+  "id": "THUNDER",
+  "file": "Thunder",
+  "type": "Power",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 251
+ },
+ {
+  "id": "TOOLSOFTHETRADE",
+  "file": "ToolsOfTheTrade",
+  "type": "Power",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 219
+ },
+ {
+  "id": "TRANSFIGURE",
+  "file": "Transfigure",
+  "type": "Skill",
+  "reasons": [
+   "UI_SELECT"
+  ],
+  "onplay_len": 492
+ },
+ {
+  "id": "TRASHTOTREASURE",
+  "file": "TrashToTreasure",
+  "type": "Power",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 219
+ },
+ {
+  "id": "TURBO",
+  "file": "Turbo",
+  "type": "Skill",
+  "reasons": [
+   "CREATES_CARDS"
+  ],
+  "onplay_len": 278
+ },
+ {
+  "id": "TUTOR",
+  "file": "Tutor",
+  "type": "Skill",
+  "reasons": [
+   "UI_SELECT"
+  ],
+  "onplay_len": 395
+ },
+ {
+  "id": "TYRANNY",
+  "file": "Tyranny",
+  "type": "Power",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 211
+ },
+ {
+  "id": "UNDERWORLD",
+  "file": "Underworld",
+  "type": "Skill",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 214
+ },
+ {
+  "id": "UPMYSLEEVE",
+  "file": "UpMySleeve",
+  "type": "Skill",
+  "reasons": [
+   "CREATES_CARDS"
+  ],
+  "onplay_len": 315
+ },
+ {
+  "id": "VENERATE",
+  "file": "Venerate",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 175
+ },
+ {
+  "id": "VICIOUS",
+  "file": "Vicious",
+  "type": "Power",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 241
+ },
+ {
+  "id": "VOLTAIC",
+  "file": "Voltaic",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 347
+ },
+ {
+  "id": "WELLLAIDPLANS",
+  "file": "WellLaidPlans",
+  "type": "Power",
+  "reasons": [
+   "APPLY_NOT_IN_TABLE"
+  ],
+  "onplay_len": 217
+ },
+ {
+  "id": "WHITENOISE",
+  "file": "WhiteNoise",
+  "type": "Skill",
+  "reasons": [
+   "CREATES_CARDS",
+   "RUN_LEVEL"
+  ],
+  "onplay_len": 563
+ },
+ {
+  "id": "WISH",
+  "file": "Wish",
+  "type": "Skill",
+  "reasons": [
+   "UI_SELECT"
+  ],
+  "onplay_len": 312
+ },
+ {
+  "id": "WISP",
+  "file": "Wisp",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 78
+ },
+ {
+  "id": "WRITHE",
+  "file": "Writhe",
+  "type": "Curse",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 0
+ },
+ {
+  "id": "ZAP",
+  "file": "Zap",
+  "type": "Skill",
+  "reasons": [
+   "UNIQUE_EFFECT"
+  ],
+  "onplay_len": 165
+ }
+]
