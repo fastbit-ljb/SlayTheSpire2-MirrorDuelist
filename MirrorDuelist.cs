@@ -1845,7 +1845,7 @@ public sealed class MirrorDuelist : MonsterModel
             }
             case "DARKNESS":
                 await ChannelMirrorOrb<DarkOrb>(ctx);
-                foreach (DarkOrb orb in _mirrorPlayer.PlayerCombatState.OrbQueue.Orbs
+                foreach (DarkOrb orb in _mirrorPlayer!.PlayerCombatState!.OrbQueue.Orbs
                     .OfType<DarkOrb>().ToList())
                 {
                     int triggers = card.IsUpgraded ? 2 : 1;
@@ -1956,7 +1956,7 @@ public sealed class MirrorDuelist : MonsterModel
                 return true;
             case "SHATTER":
             {
-                int count = _mirrorPlayer.PlayerCombatState.OrbQueue.Orbs.Count;
+                int count = _mirrorPlayer!.PlayerCombatState!.OrbQueue.Orbs.Count;
                 for (int i = 0; i < count; i++)
                 {
                     await OrbCmd.EvokeNext(ctx, _mirrorPlayer, dequeue: false);
@@ -1966,7 +1966,7 @@ public sealed class MirrorDuelist : MonsterModel
             }
             case "TESLACOIL":
             {
-                foreach (LightningOrb orb in _mirrorPlayer.PlayerCombatState.OrbQueue.Orbs
+                foreach (LightningOrb orb in _mirrorPlayer!.PlayerCombatState!.OrbQueue.Orbs
                     .OfType<LightningOrb>().ToList())
                 {
                     await OrbCmd.Passive(ctx, orb, target);
@@ -2012,9 +2012,9 @@ public sealed class MirrorDuelist : MonsterModel
     private async Task EvokeMirrorFront(PlayerChoiceContext ctx, int count)
     {
         count = Math.Max(0, count);
-        for (int i = 0; i < count && _mirrorPlayer!.PlayerCombatState.OrbQueue.Orbs.Count > 0; i++)
+        for (int i = 0; i < count && _mirrorPlayer!.PlayerCombatState!.OrbQueue.Orbs.Count > 0; i++)
         {
-            await OrbCmd.EvokeNext(ctx, _mirrorPlayer, dequeue: i == count - 1);
+            await OrbCmd.EvokeNext(ctx, _mirrorPlayer!, dequeue: i == count - 1);
         }
     }
 
