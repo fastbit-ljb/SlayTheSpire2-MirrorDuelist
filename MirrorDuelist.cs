@@ -8,6 +8,7 @@ using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Ascension;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
+using MegaCrit.Sts2.Core.Entities.Orbs;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Factories;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
@@ -20,6 +21,7 @@ using MegaCrit.Sts2.Core.Models.Cards;
 using MegaCrit.Sts2.Core.Models.CardPools;
 using MegaCrit.Sts2.Core.Models.Enchantments;
 using MegaCrit.Sts2.Core.Models.Monsters;
+using MegaCrit.Sts2.Core.Models.Orbs;
 using MegaCrit.Sts2.Core.Models.Powers;
 using MegaCrit.Sts2.Core.MonsterMoves.Intents;
 using MegaCrit.Sts2.Core.MonsterMoves.MonsterMoveStateMachine;
@@ -80,6 +82,7 @@ public sealed class MirrorDuelist : MonsterModel
     private int _pendingDrawBonus;
     private int _pendingBlockBonus;
     private int _mirrorCardsDrawnThisCombat;
+    private int _mirrorOrbsChanneledThisCombat;
 
     // Energy granted mid-turn by played cards (Bloodletting, Offering, ...);
     // the greedy continuation spends it the same turn.
@@ -126,6 +129,7 @@ public sealed class MirrorDuelist : MonsterModel
     {
         await base.AfterAddedToRoom();
         _mirrorCardsDrawnThisCombat = 0;
+        _mirrorOrbsChanneledThisCombat = 0;
         FlipToFaceThePlayer();
         Player? real = CurrentPlayer();
         _mirrorPlayer = real != null ? MirrorPlayerFactory.Create(real, Creature) : null;
@@ -777,6 +781,7 @@ public sealed class MirrorDuelist : MonsterModel
             interpreted |= await TrySpecialEffect(card, target, ctx, cardPlay);
             interpreted |= await ApplyCardEffects(card, target, ctx, cardPlay);
             interpreted |= await ApplyTablePowers(card, target, ctx, cardPlay);
+            interpreted |= await ApplyMirrorStorm(card, ctx);
             if (vars.ContainsKey("Heal"))
             {
                 decimal heal = Math.Max(0m, vars.Heal.BaseValue);
@@ -1312,6 +1317,13 @@ public sealed class MirrorDuelist : MonsterModel
     /// </summary>
     private async Task<bool> TrySpecialEffect(CardModel card, Creature target, PlayerChoiceContext ctx, CardPlay cardPlay)
     {
+        // Orb cards cannot use the normal card OnPlay path here: that path is
+        // allowed to open player-only selection UI, which would deadlock an
+        // enemy turn. Resolve the Defect orb operations directly instead.
+        if (await TryOrbCardEffect(card, target, ctx, cardPlay))
+        {
+            return true;
+        }
         switch (NormalizedId(card))
         {
             // Generated-card cards: make the same random choices as vanilla,
@@ -1787,6 +1799,243 @@ public sealed class MirrorDuelist : MonsterModel
             default:
                 return false;
         }
+    }
+
+    /// <summary>
+    /// Safe translations for cards that channel, evoke, or resize the orb
+    /// queue. The mirror owns a real PlayerCombatState, so OrbCmd can still run
+    /// the vanilla orb models (passives, evocation damage, Focus modifiers and
+    /// orb visuals) while the card itself is resolved without OnPlay.
+    /// </summary>
+    private async Task<bool> TryOrbCardEffect(CardModel card, Creature target,
+        PlayerChoiceContext ctx, CardPlay cardPlay)
+    {
+        if (_mirrorPlayer == null)
+        {
+            return false;
+        }
+
+        string id = NormalizedId(card);
+        switch (id)
+        {
+            case "BALLLIGHTNING":
+                await ChannelMirrorOrb<LightningOrb>(ctx);
+                return true;
+            case "COLDSNAP":
+                await ChannelMirrorOrb<FrostOrb>(ctx);
+                return true;
+            case "CHAOS":
+                for (int i = 0; i < Math.Max(0, IntVar(card, "Repeat", 1)); i++)
+                {
+                    OrbModel orb = OrbModel.GetRandomOrb(
+                        _mirrorPlayer.RunState.Rng.CombatOrbGeneration).ToMutable();
+                    await OrbCmd.Channel(ctx, orb, _mirrorPlayer);
+                    _mirrorOrbsChanneledThisCombat++;
+                }
+                return true;
+            case "CHILL":
+            {
+                int targets = Creature.CombatState?.GetOpponentsOf(Creature)
+                    .Count(c => c.IsHittable) ?? 1;
+                for (int i = 0; i < Math.Max(1, targets); i++)
+                {
+                    await ChannelMirrorOrb<FrostOrb>(ctx);
+                }
+                return true;
+            }
+            case "DARKNESS":
+                await ChannelMirrorOrb<DarkOrb>(ctx);
+                foreach (DarkOrb orb in _mirrorPlayer.PlayerCombatState.OrbQueue.Orbs
+                    .OfType<DarkOrb>().ToList())
+                {
+                    int triggers = card.IsUpgraded ? 2 : 1;
+                    for (int i = 0; i < triggers; i++)
+                    {
+                        await OrbCmd.Passive(ctx, orb, null);
+                    }
+                }
+                return true;
+            case "FUSION":
+                await ChannelMirrorOrb<PlasmaOrb>(ctx);
+                return true;
+            case "GLACIER":
+                await ChannelMirrorOrb<FrostOrb>(ctx);
+                await ChannelMirrorOrb<FrostOrb>(ctx);
+                return true;
+            case "GLASSWORK":
+                await ChannelMirrorOrb<GlassOrb>(ctx);
+                return true;
+            case "RAINBOW":
+                await ChannelMirrorOrb<LightningOrb>(ctx);
+                await ChannelMirrorOrb<FrostOrb>(ctx);
+                await ChannelMirrorOrb<DarkOrb>(ctx);
+                return true;
+            case "ZAP":
+                await ChannelMirrorOrb<LightningOrb>(ctx);
+                return true;
+            case "COOLHEADED":
+                await ChannelMirrorOrb<FrostOrb>(ctx);
+                return true;
+            case "CONSUMINGSHADOW":
+                for (int i = 0; i < Math.Max(0, IntVar(card, "Repeat", 2)); i++)
+                {
+                    await ChannelMirrorOrb<DarkOrb>(ctx);
+                }
+                return true;
+            case "HIBERNATE":
+            case "ICELANCE":
+                for (int i = 0; i < Math.Max(0, IntVar(card, "Repeat", id == "ICELANCE" ? 3 : 2)); i++)
+                {
+                    await ChannelMirrorOrb<FrostOrb>(ctx);
+                }
+                return true;
+            case "IGNITION":
+                // The vanilla card targets an ally's Player. The mirror has no
+                // ally target selection, so its generated Plasma belongs to
+                // the mirror itself rather than the real player's side.
+                await ChannelMirrorOrb<PlasmaOrb>(ctx);
+                return true;
+            case "METEORSTRIKE":
+                for (int i = 0; i < 3; i++)
+                {
+                    await ChannelMirrorOrb<PlasmaOrb>(ctx);
+                }
+                return true;
+            case "NULL":
+            case "SHADOWSHIELD":
+                await ChannelMirrorOrb<DarkOrb>(ctx);
+                return true;
+            case "REFRACT":
+                for (int i = 0; i < Math.Max(0, IntVar(card, "Repeat", 2)); i++)
+                {
+                    await ChannelMirrorOrb<GlassOrb>(ctx);
+                }
+                return true;
+            case "SPINNER":
+                if (card.IsUpgraded)
+                {
+                    await ChannelMirrorOrb<GlassOrb>(ctx);
+                }
+                return card.IsUpgraded;
+            case "TEMPEST":
+            {
+                int amount = ResolveMirrorX(card);
+                if (card.IsUpgraded)
+                {
+                    amount++;
+                }
+                for (int i = 0; i < amount; i++)
+                {
+                    await ChannelMirrorOrb<LightningOrb>(ctx);
+                }
+                return true;
+            }
+            case "VOLTAIC":
+                for (int i = 0; i < _mirrorOrbsChanneledThisCombat; i++)
+                {
+                    await ChannelMirrorOrb<LightningOrb>(ctx);
+                }
+                return true;
+            case "CAPACITOR":
+            case "MODDED":
+                await OrbCmd.AddSlots(_mirrorPlayer,
+                    Math.Max(0, IntVar(card, "Repeat", id == "CAPACITOR" ? 2 : 1)));
+                return true;
+            case "BULKUP":
+                OrbCmd.RemoveSlots(_mirrorPlayer,
+                    Math.Max(0, IntVar(card, "OrbSlots", 1)));
+                return true;
+            case "DUALCAST":
+                await EvokeMirrorFront(ctx, 2);
+                return true;
+            case "MULTICAST":
+                await EvokeMirrorFront(ctx, ResolveMirrorX(card));
+                return true;
+            case "QUADCAST":
+                await EvokeMirrorFront(ctx, Math.Max(0, IntVar(card, "Repeat", 4)));
+                return true;
+            case "SHATTER":
+            {
+                int count = _mirrorPlayer.PlayerCombatState.OrbQueue.Orbs.Count;
+                for (int i = 0; i < count; i++)
+                {
+                    await OrbCmd.EvokeNext(ctx, _mirrorPlayer, dequeue: false);
+                    await OrbCmd.EvokeNext(ctx, _mirrorPlayer);
+                }
+                return count > 0;
+            }
+            case "TESLACOIL":
+            {
+                foreach (LightningOrb orb in _mirrorPlayer.PlayerCombatState.OrbQueue.Orbs
+                    .OfType<LightningOrb>().ToList())
+                {
+                    await OrbCmd.Passive(ctx, orb, target);
+                    if (card.IsUpgraded)
+                    {
+                        await OrbCmd.Passive(ctx, orb, target);
+                    }
+                }
+                return true;
+            }
+            default:
+                return false;
+        }
+    }
+
+    private async Task<bool> ApplyMirrorStorm(CardModel card, PlayerChoiceContext ctx)
+    {
+        // Storm's vanilla hook observes every Power card played after Storm.
+        // The safe interpreter does not dispatch PowerModel card hooks, so
+        // reproduce that one deterministic trigger explicitly.
+        if (card.Type != CardType.Power || NormalizedId(card) == "STORM")
+        {
+            return false;
+        }
+        int amount = Creature.GetPowerAmount<StormPower>();
+        if (amount <= 0)
+        {
+            return false;
+        }
+        for (int i = 0; i < amount; i++)
+        {
+            await ChannelMirrorOrb<LightningOrb>(ctx);
+        }
+        return true;
+    }
+
+    private async Task ChannelMirrorOrb<T>(PlayerChoiceContext ctx) where T : OrbModel
+    {
+        await OrbCmd.Channel<T>(ctx, _mirrorPlayer!);
+        _mirrorOrbsChanneledThisCombat++;
+    }
+
+    private async Task EvokeMirrorFront(PlayerChoiceContext ctx, int count)
+    {
+        count = Math.Max(0, count);
+        for (int i = 0; i < count && _mirrorPlayer!.PlayerCombatState.OrbQueue.Orbs.Count > 0; i++)
+        {
+            await OrbCmd.EvokeNext(ctx, _mirrorPlayer, dequeue: i == count - 1);
+        }
+    }
+
+    private static int IntVar(CardModel card, string key, int fallback)
+    {
+        return card.DynamicVars.ContainsKey(key)
+            ? card.DynamicVars[key].IntValue
+            : fallback;
+    }
+
+    private static int ResolveMirrorX(CardModel card)
+    {
+        if (!card.EnergyCost.CostsX)
+        {
+            return 0;
+        }
+        int captured = card.EnergyCost.CapturedXValue;
+        // The mirror planner does not run CardModel.SpendResources (that would
+        // mutate the real player's energy). Five is its normal per-turn budget;
+        // use it when no captured X value was supplied by a generated card.
+        return captured > 0 ? captured : TurnEnergy;
     }
 
     private async Task AddMirrorShivs(CardModel source, Creature target, int count,
