@@ -62,6 +62,10 @@ Press `` ` `` in-game:
 
 ## Status
 
-Test version (v0.4.0), installed locally, not on the Workshop yet. Known
-limitation: 71 player powers are untranslatable on a monster owner and play as
-duds; check the log for `resolved as a safe dud` lines.
+Test version (v0.5.0), installed locally, not on the Workshop yet.
+
+Coverage: ~74% of all 575 stealable cards have real effects on the duelist
+(power table 168 + effect table 37 + bespoke specials 16 + the var-driven
+attack/block paths). The remaining 151 dud cards are catalogued with reasons
+in UNIMPLEMENTED.md — mostly powers whose hooks are hardwired to the owning
+player (audit-verified), orb/star cards, UI-selection cards and curses.
