@@ -3,7 +3,7 @@
   "name": "Mirror Duelist",
   "author": "fastbit-ljb",
   "description": "Adds the Mirror Duelist, an Act 3 enemy that copies your character's look, has 1.5x your max HP, steals three cards, and spends 5 energy playing them against you each turn. 新增第三层敌人“镜像决斗家”：复制角色外观，生命值为玩家最大生命值的1.5倍，偷取三张牌并每回合用5点费用打出。",
-  "version": "0.5.0",
+  "version": "0.6.2",
   "has_pck": true,
   "has_dll": true,
   "dependencies": [],

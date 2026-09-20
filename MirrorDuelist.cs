@@ -17,6 +17,8 @@ using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Logging;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Cards;
+using MegaCrit.Sts2.Core.Models.CardPools;
+using MegaCrit.Sts2.Core.Models.Enchantments;
 using MegaCrit.Sts2.Core.Models.Monsters;
 using MegaCrit.Sts2.Core.Models.Powers;
 using MegaCrit.Sts2.Core.MonsterMoves.Intents;
@@ -77,6 +79,7 @@ public sealed class MirrorDuelist : MonsterModel
     private int _pendingEnergyBonus;
     private int _pendingDrawBonus;
     private int _pendingBlockBonus;
+    private int _mirrorCardsDrawnThisCombat;
 
     // Energy granted mid-turn by played cards (Bloodletting, Offering, ...);
     // the greedy continuation spends it the same turn.
@@ -122,6 +125,7 @@ public sealed class MirrorDuelist : MonsterModel
     public override async Task AfterAddedToRoom()
     {
         await base.AfterAddedToRoom();
+        _mirrorCardsDrawnThisCombat = 0;
         FlipToFaceThePlayer();
         Player? real = CurrentPlayer();
         _mirrorPlayer = real != null ? MirrorPlayerFactory.Create(real, Creature) : null;
@@ -529,6 +533,7 @@ public sealed class MirrorDuelist : MonsterModel
             CardModel top = draw.Cards[^1];
             draw.RemoveInternal(top);
             hand.AddInternal(top);
+            _mirrorCardsDrawnThisCombat++;
         }
         var order = hand.Cards.OrderBy(_ => RunRng.MonsterAi.NextFloat()).ToList();
         var plays = new List<CardModel?>();
@@ -1309,6 +1314,295 @@ public sealed class MirrorDuelist : MonsterModel
     {
         switch (NormalizedId(card))
         {
+            // Generated-card cards: make the same random choices as vanilla,
+            // but file the results into the mirror player's private hand or
+            // draw pile instead of opening a player selection screen.
+            case "BLADEDANCE":
+                await AddMirrorShivs(card, target,
+                    card.DynamicVars.ContainsKey("Cards") ? card.DynamicVars.Cards.IntValue : 3,
+                    enchanted: false, playImmediately: false);
+                return true;
+            case "BLADEOFINK":
+                await AddMirrorShivs(card, target,
+                    card.DynamicVars.ContainsKey("Cards") ? card.DynamicVars.Cards.IntValue : 2,
+                    enchanted: true, playImmediately: false);
+                return true;
+            case "BLADESYMPHONY":
+                await AddMirrorShivs(card, target,
+                    card.DynamicVars.ContainsKey("Cards") ? card.DynamicVars.Cards.IntValue : 2,
+                    enchanted: false, playImmediately: false);
+                return true;
+            case "STORMOFSTEEL":
+            {
+                CardPile? hand = MirrorPile(PileType.Hand);
+                int count = hand?.Cards.Count ?? 0;
+                if (hand != null)
+                {
+                    CardPile? discard = MirrorPile(PileType.Discard);
+                    foreach (CardModel c in hand.Cards.ToList())
+                    {
+                        hand.RemoveInternal(c);
+                        if (discard != null && !discard.Cards.Contains(c))
+                        {
+                            discard.AddInternal(c);
+                        }
+                    }
+                }
+                await AddMirrorShivs(card, target, count, enchanted: false, playImmediately: false,
+                    upgraded: card.IsUpgraded);
+                return true;
+            }
+            case "HIDDENDAGGERS":
+            {
+                int discardCount = card.DynamicVars.ContainsKey("Cards") ? card.DynamicVars.Cards.IntValue : 2;
+                await DiscardMirrorCards(discardCount);
+                int shivs = card.DynamicVars.ContainsKey("Shivs") ? card.DynamicVars["Shivs"].IntValue : 2;
+                await AddMirrorShivs(card, target, shivs, enchanted: false, playImmediately: false,
+                    upgraded: card.IsUpgraded);
+                return true;
+            }
+            case "BUNDLEOFJOY":
+            case "JACKOFALLTRADES":
+            case "LARGESSE":
+            case "QUASAR":
+            {
+                int count = card.DynamicVars.ContainsKey("Cards") ? card.DynamicVars.Cards.IntValue : 1;
+                IEnumerable<CardModel> pool = ModelDb.CardPool<ColorlessCardPool>()
+                    .GetUnlockedCards(_mirrorPlayer!.UnlockState, _mirrorPlayer.RunState.CardMultiplayerConstraint);
+                IEnumerable<CardModel> generated = CardFactory.GetDistinctForCombat(
+                    _mirrorPlayer, pool, Math.Clamp(count, 1, 3),
+                    _mirrorPlayer.RunState.Rng.CombatCardGeneration);
+                foreach (CardModel generatedCard in generated)
+                {
+                    if (card.IsUpgraded)
+                    {
+                        CardCmd.Upgrade(generatedCard);
+                    }
+                    await AddMirrorGeneratedToHand(generatedCard, freeThisTurn: false);
+                }
+                return true;
+            }
+            case "DISTRACTION":
+            case "INFERNALBLADE":
+            case "WHITENOISE":
+            {
+                IEnumerable<CardModel> pool = _mirrorPlayer!.Character.CardPool.GetUnlockedCards(
+                    _mirrorPlayer.UnlockState, _mirrorPlayer.RunState.CardMultiplayerConstraint);
+                CardType wanted = NormalizedId(card) switch
+                {
+                    "DISTRACTION" => CardType.Skill,
+                    "INFERNALBLADE" => CardType.Attack,
+                    _ => CardType.Power,
+                };
+                CardModel? generatedCard = CardFactory.GetDistinctForCombat(
+                    _mirrorPlayer, pool.Where(c => c.Type == wanted), 1,
+                    _mirrorPlayer.RunState.Rng.CombatCardGeneration).FirstOrDefault();
+                if (generatedCard != null)
+                {
+                    await AddMirrorGeneratedToHand(generatedCard, freeThisTurn: true);
+                }
+                return true;
+            }
+            case "METAMORPHOSIS":
+            {
+                int count = card.DynamicVars.ContainsKey("Cards") ? card.DynamicVars.Cards.IntValue : 3;
+                IEnumerable<CardModel> pool = _mirrorPlayer!.Character.CardPool.GetUnlockedCards(
+                    _mirrorPlayer.UnlockState, _mirrorPlayer.RunState.CardMultiplayerConstraint)
+                    .Where(c => c.Type == CardType.Attack);
+                CardPile? draw = MirrorPile(PileType.Draw);
+                if (draw != null)
+                {
+                    foreach (CardModel generatedCard in CardFactory.GetForCombat(
+                        _mirrorPlayer, pool, Math.Clamp(count, 1, 6),
+                        _mirrorPlayer.RunState.Rng.CombatCardGeneration))
+                    {
+                        generatedCard.SetToFreeThisCombat();
+                        draw.AddInternal(generatedCard);
+                    }
+                }
+                return true;
+            }
+            case "OVERCLOCK":
+            {
+                int count = card.DynamicVars.ContainsKey("Cards") ? card.DynamicVars.Cards.IntValue : 2;
+                DrawFromMirrorDrawIntoHand(count);
+                CardModel burn = card.CombatState!.CreateCard<Burn>(_mirrorPlayer!);
+                CardPile? discard = MirrorPile(PileType.Discard);
+                if (discard != null && !discard.Cards.Contains(burn))
+                {
+                    discard.AddInternal(burn);
+                }
+                return true;
+            }
+            case "STOKE":
+            {
+                CardPile? hand = MirrorPile(PileType.Hand);
+                CardPile? exhaust = MirrorPile(PileType.Exhaust);
+                int count = hand?.Cards.Count ?? 0;
+                if (hand != null && exhaust != null)
+                {
+                    foreach (CardModel c in hand.Cards.ToList())
+                    {
+                        hand.RemoveInternal(c);
+                        if (!exhaust.Cards.Contains(c))
+                        {
+                            exhaust.AddInternal(c);
+                        }
+                    }
+                }
+                IEnumerable<CardModel> pool = _mirrorPlayer!.Character.CardPool.GetUnlockedCards(
+                    _mirrorPlayer.UnlockState, _mirrorPlayer.RunState.CardMultiplayerConstraint);
+                foreach (CardModel generatedCard in CardFactory.GetForCombat(
+                    _mirrorPlayer, pool, count, _mirrorPlayer.RunState.Rng.CombatCardGeneration))
+                {
+                    if (card.IsUpgraded)
+                    {
+                        CardCmd.Upgrade(generatedCard);
+                    }
+                    await AddMirrorGeneratedToHand(generatedCard, freeThisTurn: false);
+                }
+                return true;
+            }
+            case "TURBO":
+            {
+                int energy = card.DynamicVars.ContainsKey("Energy") ? card.DynamicVars.Energy.IntValue : 2;
+                _bonusEnergyThisTurn += Math.Max(0, energy);
+                CardModel voidCard = card.CombatState!.CreateCard<MegaCrit.Sts2.Core.Models.Cards.Void>(_mirrorPlayer!);
+                CardPile? discard = MirrorPile(PileType.Discard);
+                if (discard != null && !discard.Cards.Contains(voidCard))
+                {
+                    discard.AddInternal(voidCard);
+                }
+                return true;
+            }
+            // Automatic, deterministic replacements for hand/draw selection.
+            case "ACROBATICS":
+            case "PREPARED":
+            {
+                int drawCount = card.DynamicVars.ContainsKey("Cards") ? card.DynamicVars.Cards.IntValue : 1;
+                DrawFromMirrorDrawIntoHand(drawCount);
+                await DiscardMirrorCards(drawCount);
+                return true;
+            }
+            case "BURNINGPACT":
+            {
+                await ExhaustMirrorCards(1);
+                int drawCount = card.DynamicVars.ContainsKey("Cards") ? card.DynamicVars.Cards.IntValue : 2;
+                DrawFromMirrorDrawIntoHand(drawCount);
+                return true;
+            }
+            case "DREDGE":
+            {
+                int count = card.DynamicVars.ContainsKey("Cards") ? card.DynamicVars.Cards.IntValue : 3;
+                MoveDiscardToMirrorHand(count);
+                return true;
+            }
+            case "DUALWIELD":
+            {
+                int count = card.DynamicVars.ContainsKey("Cards") ? card.DynamicVars.Cards.IntValue : 1;
+                CardPile? hand = MirrorPile(PileType.Hand);
+                CardModel? source = hand?.Cards
+                    .Where(c => c.Type is CardType.Attack or CardType.Power)
+                    .OrderByDescending(GeneratedCardScore).FirstOrDefault();
+                if (source != null)
+                {
+                    for (int i = 0; i < Math.Clamp(count, 1, 3); i++)
+                    {
+                        await AddMirrorGeneratedToHand(source.CreateDupe(_mirrorPlayer!), freeThisTurn: false);
+                    }
+                }
+                return true;
+            }
+            case "SECRETTECHNIQUE":
+                MoveTopMatchingDrawToHand(CardType.Skill);
+                return true;
+            case "SECRETWEAPON":
+            case "TUTOR":
+                MoveTopMatchingDrawToHand(CardType.Attack);
+                return true;
+            case "WISH":
+                MoveTopMatchingDrawToHand(null);
+                return true;
+            case "GLIMMER":
+            {
+                int drawCount = card.DynamicVars.ContainsKey("Cards") ? card.DynamicVars.Cards.IntValue : 3;
+                DrawFromMirrorDrawIntoHand(drawCount);
+                MoveHighestMirrorHandToDraw();
+                return true;
+            }
+            case "THINKINGAHEAD":
+            {
+                int drawCount = card.DynamicVars.ContainsKey("Cards") ? card.DynamicVars.Cards.IntValue : 2;
+                DrawFromMirrorDrawIntoHand(drawCount);
+                MoveHighestMirrorHandToDraw();
+                return true;
+            }
+            case "PURITY":
+                await ExhaustMirrorCards(card.DynamicVars.ContainsKey("Cards") ? card.DynamicVars.Cards.IntValue : 3);
+                return true;
+            case "TRANSFIGURE":
+            {
+                CardModel? selected = MirrorPile(PileType.Hand)?.Cards
+                    .OrderByDescending(GeneratedCardScore).FirstOrDefault();
+                if (selected != null && !selected.EnergyCost.CostsX)
+                {
+                    selected.EnergyCost.AddThisCombat(1);
+                    selected.BaseReplayCount++;
+                }
+                return selected != null;
+            }
+            case "PRIMALFORCE":
+            {
+                CardPile? hand = MirrorPile(PileType.Hand);
+                if (hand == null)
+                {
+                    return false;
+                }
+                foreach (CardModel selected in hand.Cards.Where(c => c.Type == CardType.Attack && c.IsTransformable).ToList())
+                {
+                    await CardCmd.TransformTo<GiantRock>(selected);
+                }
+                return true;
+            }
+            case "BEGONE":
+            {
+                CardModel? selected = MirrorPile(PileType.Hand)?.Cards
+                    .OrderByDescending(GeneratedCardScore).FirstOrDefault();
+                if (selected != null)
+                {
+                    await CardCmd.TransformTo<MinionStrike>(selected);
+                }
+                return selected != null;
+            }
+            case "CHARGE":
+            {
+                CardPile? draw = MirrorPile(PileType.Draw);
+                int count = card.DynamicVars.ContainsKey("Cards") ? card.DynamicVars.Cards.IntValue : 2;
+                foreach (CardModel selected in draw?.Cards.Where(c => c.Type == CardType.Attack).Take(count).ToList()
+                    ?? Enumerable.Empty<CardModel>())
+                {
+                    await CardCmd.TransformTo<MinionDiveBomb>(selected);
+                }
+                return true;
+            }
+            case "SEANCE":
+            {
+                CardPile? draw = MirrorPile(PileType.Draw);
+                int count = card.DynamicVars.ContainsKey("Cards") ? card.DynamicVars.Cards.IntValue : 1;
+                foreach (CardModel selected in draw?.Cards.Take(count).ToList() ?? Enumerable.Empty<CardModel>())
+                {
+                    await CardCmd.TransformTo<Soul>(selected);
+                }
+                return true;
+            }
+            case "GUARDS":
+            {
+                foreach (CardModel selected in MirrorPile(PileType.Hand)?.Cards.ToList() ?? Enumerable.Empty<CardModel>())
+                {
+                    await CardCmd.TransformTo<MinionSacrifice>(selected);
+                }
+                return true;
+            }
             case "BATTLETANCE":
             {
                 int n = card.DynamicVars.ContainsKey("Cards") ? Math.Clamp(card.DynamicVars.Cards.IntValue, 1, 10) : 3;
@@ -1495,6 +1789,156 @@ public sealed class MirrorDuelist : MonsterModel
         }
     }
 
+    private async Task AddMirrorShivs(CardModel source, Creature target, int count,
+        bool enchanted, bool playImmediately, bool upgraded = false)
+    {
+        if (_mirrorPlayer == null || source.CombatState == null)
+        {
+            return;
+        }
+        for (int i = 0; i < Math.Clamp(count, 0, 12); i++)
+        {
+            CardModel shiv = source.CombatState.CreateCard<Shiv>(_mirrorPlayer);
+            if (enchanted)
+            {
+                CardCmd.Enchant<Inky>(shiv, 1m);
+            }
+            if (upgraded)
+            {
+                CardCmd.Upgrade(shiv);
+            }
+            if (playImmediately)
+            {
+                await PlayGeneratedCard(shiv, target, makeFree: true);
+            }
+            else
+            {
+                await AddMirrorGeneratedToHand(shiv, freeThisTurn: true);
+            }
+        }
+    }
+
+    private Task AddMirrorGeneratedToHand(CardModel card, bool freeThisTurn)
+    {
+        if (_mirrorPlayer == null)
+        {
+            return Task.CompletedTask;
+        }
+        if (freeThisTurn)
+        {
+            card.SetToFreeThisTurn();
+        }
+        CardPile? hand = MirrorPile(PileType.Hand);
+        if (hand != null && !hand.Cards.Contains(card))
+        {
+            hand.AddInternal(card);
+        }
+        return Task.CompletedTask;
+    }
+
+    private async Task DiscardMirrorCards(int count)
+    {
+        CardPile? hand = MirrorPile(PileType.Hand);
+        CardPile? discard = MirrorPile(PileType.Discard);
+        if (hand == null || discard == null)
+        {
+            return;
+        }
+        foreach (CardModel card in hand.Cards
+            .OrderBy(c => PlayCost(c))
+            .ThenBy(c => c.Id.Entry)
+            .Take(Math.Max(0, count)).ToList())
+        {
+            hand.RemoveInternal(card);
+            if (!discard.Cards.Contains(card))
+            {
+                discard.AddInternal(card);
+            }
+        }
+        await Task.CompletedTask;
+    }
+
+    private async Task ExhaustMirrorCards(int count)
+    {
+        CardPile? hand = MirrorPile(PileType.Hand);
+        CardPile? exhaust = MirrorPile(PileType.Exhaust);
+        if (hand == null || exhaust == null)
+        {
+            return;
+        }
+        foreach (CardModel card in hand.Cards
+            .OrderBy(c => PlayCost(c))
+            .ThenBy(c => c.Id.Entry)
+            .Take(Math.Max(0, count)).ToList())
+        {
+            hand.RemoveInternal(card);
+            if (!exhaust.Cards.Contains(card))
+            {
+                exhaust.AddInternal(card);
+            }
+        }
+        await Task.CompletedTask;
+    }
+
+    private void MoveDiscardToMirrorHand(int count)
+    {
+        CardPile? discard = MirrorPile(PileType.Discard);
+        CardPile? hand = MirrorPile(PileType.Hand);
+        if (discard == null || hand == null)
+        {
+            return;
+        }
+        foreach (CardModel card in discard.Cards.Take(Math.Max(0, count)).ToList())
+        {
+            discard.RemoveInternal(card);
+            if (!hand.Cards.Contains(card))
+            {
+                hand.AddInternal(card);
+            }
+        }
+    }
+
+    private void MoveTopMatchingDrawToHand(CardType? type)
+    {
+        CardPile? draw = MirrorPile(PileType.Draw);
+        CardPile? hand = MirrorPile(PileType.Hand);
+        if (draw == null || hand == null)
+        {
+            return;
+        }
+        CardModel? card = draw.Cards.AsEnumerable().Reverse()
+            .FirstOrDefault(c => type == null || c.Type == type);
+        if (card == null)
+        {
+            return;
+        }
+        draw.RemoveInternal(card);
+        if (!hand.Cards.Contains(card))
+        {
+            hand.AddInternal(card);
+        }
+    }
+
+    private void MoveHighestMirrorHandToDraw()
+    {
+        CardPile? hand = MirrorPile(PileType.Hand);
+        CardPile? draw = MirrorPile(PileType.Draw);
+        if (hand == null || draw == null)
+        {
+            return;
+        }
+        CardModel? card = hand.Cards.OrderByDescending(GeneratedCardScore).FirstOrDefault();
+        if (card == null)
+        {
+            return;
+        }
+        hand.RemoveInternal(card);
+        if (!draw.Cards.Contains(card))
+        {
+            draw.AddInternal(card);
+        }
+    }
+
     /// <summary>Moves up to n cards from the mirror draw pile into its hand
     /// (no draw command: the mirror player has no hand UI). The turn's greedy
     /// continuation plays them while energy remains.</summary>
@@ -1527,6 +1971,7 @@ public sealed class MirrorDuelist : MonsterModel
             {
                 hand.AddInternal(top);
             }
+            _mirrorCardsDrawnThisCombat++;
             n--;
         }
     }
@@ -1654,6 +2099,8 @@ public sealed class MirrorDuelist : MonsterModel
         // vanilla preview calculation.
         bool scalesWithOstyHp = card is Unleash ||
             NormalizedId(card).EndsWith("UNLEASH", StringComparison.Ordinal);
+        bool isMurder = card is Murder ||
+            NormalizedId(card).Equals("MURDER", StringComparison.Ordinal);
         bool isShiv = card is Shiv || card.Tags.Contains(CardTag.Shiv);
         decimal damage;
         if (scalesWithOstyHp &&
@@ -1665,6 +2112,16 @@ public sealed class MirrorDuelist : MonsterModel
             decimal ostyHp = enemyOsty?.CurrentHp ?? 0m;
             damage = card.DynamicVars["CalculationBase"].BaseValue +
                 card.DynamicVars["ExtraDamage"].BaseValue * ostyHp;
+        }
+        else if (isMurder && card.DynamicVars.ContainsKey("CalculationBase") &&
+            card.DynamicVars.ContainsKey("ExtraDamage"))
+        {
+            // Murder's CalculatedDamage delegate counts CardDrawnEntry for
+            // the card owner. The mirror player has no normal draw phase, so
+            // maintain the equivalent count in our private pile interpreter.
+            damage = card.DynamicVars["CalculationBase"].BaseValue +
+                card.DynamicVars["ExtraDamage"].BaseValue * _mirrorCardsDrawnThisCombat;
+            Log.Info($"[MirrorDuelist] Murder uses {_mirrorCardsDrawnThisCombat} mirror draws => {damage} damage.");
         }
         else if (card.DynamicVars.ContainsKey("Damage"))
         {
@@ -1685,7 +2142,7 @@ public sealed class MirrorDuelist : MonsterModel
         {
             damage = DamageFallback;
         }
-        damage = Clamp(damage, isShiv ? 0m : DamageClampMin,
+        damage = Clamp(damage, isShiv || isMurder ? 0m : DamageClampMin,
             scalesWithOstyHp ? 999m : DamageClampMax);
         // Card enchantments ride along (Sharp/Momentum/Vigorous/Tezcataras's
         // Ember add damage, Corrupted/Instinct multiply it) — same hooks the
@@ -1703,7 +2160,7 @@ public sealed class MirrorDuelist : MonsterModel
         {
             damage += Creature.GetPowerAmount<AccuracyPower>();
         }
-        decimal minimum = isShiv ? 0m : DamageClampMin;
+        decimal minimum = isShiv || isMurder ? 0m : DamageClampMin;
         return Clamp(damage, minimum, scalesWithOstyHp ? 999m : 60m);
     }
 
