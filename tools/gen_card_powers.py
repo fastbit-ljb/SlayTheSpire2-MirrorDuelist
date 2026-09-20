@@ -43,7 +43,7 @@ EXCLUDED_POWERS = {
 # table data (conditional amounts, free-hand sweeps, pending-economy forms).
 SPECIAL_CASES = {
     "BattleTrance", "BulletTime", "OneForAll", "Plot", "Prolong",
-    "Entrench", "DoubleEnergy", "BelieveInYou", "CalculatedGamble",
+    "Entrench", "DoubleEnergy", "BelieveInYou", "CalculatedGamble", "Apotheosis", "EnergySurge",
     "Cascade", "Havoc", "Sacrifice", "DemonicShield", "Enlightenment",
 }
 

@@ -1463,6 +1463,33 @@ public sealed class MirrorDuelist : MonsterModel
                 }
                 return true;
             }
+            case "APOTHEOSIS":
+            {
+                Player? owner = CurrentPlayer();
+                if (owner == null)
+                {
+                    return false;
+                }
+                foreach (CardModel c in PileType.Deck.GetPile(owner).Cards.ToList())
+                {
+                    if (c.IsUpgradable)
+                    {
+                        CardCmd.Upgrade(c);
+                    }
+                }
+                return true;
+            }
+            case "ENERGYSURGE":
+            {
+                Player? targetPlayer = target.Player;
+                if (targetPlayer != null)
+                {
+                    int n = card.DynamicVars.ContainsKey("Energy") ? (int)card.DynamicVars.Energy.BaseValue : 2;
+                    await PlayerCmd.GainEnergy(n, targetPlayer);
+                    return true;
+                }
+                return false;
+            }
             default:
                 return false;
         }
