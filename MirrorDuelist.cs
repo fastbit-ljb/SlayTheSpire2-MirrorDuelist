@@ -798,6 +798,31 @@ public sealed class MirrorDuelist : MonsterModel
                 Log.Info($"[MirrorDuelist] {card.Id.Entry} resolved as a safe dud.");
             }
         }
+        // The normal CardModel play wrapper dispatches the card's
+        // enchantment hooks after all replayed copies finish.  The mirror
+        // deliberately avoids that wrapper, so consume one-shot enchantments
+        // here as well (Glam/华彩 and Vigorous/活力 must not work every turn).
+        if (card.Enchantment != null)
+        {
+            try
+            {
+                await card.Enchantment.AfterCardPlayed(ctx, new CardPlay
+                {
+                    Card = card,
+                    Player = card.Owner!,
+                    Target = target,
+                    ResultPile = PileType.Discard,
+                    Resources = new ResourceInfo { EnergySpent = 0, EnergyValue = PlayCost(card), StarsSpent = 0, StarValue = PlayCost(card) },
+                    IsAutoPlay = true,
+                    PlayIndex = 0,
+                    PlayCount = 1,
+                });
+            }
+            catch (Exception e)
+            {
+                Log.Error($"[MirrorDuelist] enchantment cleanup failed for {card.Id.Entry}: {e}");
+            }
+        }
         // Curses, statuses and untranslatable skills are played as duds - the
         // duelist wastes the card and its energy, exactly like you would.
     }
