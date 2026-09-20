@@ -81,7 +81,7 @@ def main() -> None:
         table_has = cid in table_ids
         rider_only = (not table_has) and any(a in RIDER_KEYS for a in applies_full)
 
-        dmg_expr = "Damage" in text and "new DamageVar" in text
+        dmg_expr = "Damage" in text and ("new DamageVar" in text or "new PowerVar<StrengthPower>" in text or "OstyDamage" in text)
         dmg_calc = "new CalculatedVar" in text or "CalculatedDamage" in text
         block_var = 'new BlockVar' in text or '"Block"' in text
 

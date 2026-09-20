@@ -54,6 +54,14 @@ internal readonly struct CardEffect
         => new("add_status", null, status, null, n, 1, EffectTarget.Self, pile);
     public static CardEffect Shivs(string? varKey, decimal constValue)
         => new("shivs", null, null, varKey, constValue, 1, EffectTarget.Self, null);
+    public static CardEffect EnergyNow(string? varKey, decimal constValue)
+        => new("energy_now", null, null, varKey, constValue, 1, EffectTarget.Self, null);
+    public static CardEffect SummonOsty(string? varKey, decimal constValue)
+        => new("summon_osty", null, null, varKey, constValue, 1, EffectTarget.Self, null);
+    public static CardEffect Forge(string? varKey, decimal constValue)
+        => new("forge", null, null, varKey, constValue, 1, EffectTarget.Self, null);
+    public static CardEffect MaxHpLoss(string? varKey, decimal constValue)
+        => new("max_hp_loss", null, null, varKey, constValue, 1, EffectTarget.Self, null);
 }
 
 internal static class MirrorCardEffects
@@ -62,6 +70,42 @@ internal static class MirrorCardEffects
 
     private static readonly Dictionary<string, CardEffect[]> _table = new(StringComparer.Ordinal)
     {
-        // [cardId] = new CardEffect[] { ... }  — filled from audit results
+        // ---- energy skills (interpreter continuation energy) ----
+        ["ADRENALINE"] = new[] { CardEffect.EnergyNow("Energy", 2), CardEffect.DrawHand("Cards", 1) },
+        ["ALIGNMENT"] = new[] { CardEffect.EnergyNow("Energy", 2) },
+        ["BLOODLETTING"] = new[] { CardEffect.HpLoss("HpLoss", 3), CardEffect.EnergyNow("Energy", 2) },
+        ["BRIGHTFLAME"] = new[] { CardEffect.EnergyNow("Energy", 3), CardEffect.DrawHand("Cards", 1), CardEffect.MaxHpLoss("MaxHp", 6) },
+        ["FORGOTTENRITUAL"] = new[] { CardEffect.EnergyNow("Energy", 2) },
+        ["FUEL"] = new[] { CardEffect.EnergyNow("Energy", 2) },
+        ["LUMINESCE"] = new[] { CardEffect.EnergyNow("Energy", 2) },
+        ["OFFERING"] = new[] { CardEffect.HpLoss("HpLoss", 6), CardEffect.EnergyNow("Energy", 2), CardEffect.DrawHand("Cards", 5) },
+        ["PRODUCTION"] = new[] { CardEffect.EnergyNow("Energy", 2) },
+        ["RESTLESSNESS"] = new[] { CardEffect.DrawHand("Cards", 1), CardEffect.EnergyNow("Energy", 1) },
+        ["SUPERCRITICAL"] = new[] { CardEffect.EnergyNow("Energy", 2) },
+        ["TACTICIAN"] = new[] { CardEffect.EnergyNow("Energy", 1) },
+        ["WISP"] = new[] { CardEffect.EnergyNow("Energy", 1) },
+        // ---- draw skills ----
+        ["DRUMOFBATTLE"] = new[] { CardEffect.DrawHand("Cards", 2) },
+        ["EXPERTISE"] = new[] { CardEffect.DrawHand("Cards", 3) },
+        ["HUDDLEUP"] = new[] { CardEffect.DrawHand("Cards", 2) },
+        ["IMPATIENCE"] = new[] { CardEffect.DrawHand("Cards", 2) },
+        ["MASTEROFTHESTRATEGY"] = new[] { CardEffect.DrawHand("Cards", 3) },
+        ["PARSE"] = new[] { CardEffect.DrawHand("Cards", 2) },
+        ["PROPHESIZE"] = new[] { CardEffect.DrawHand("Cards", 2) },
+        ["REFLEX"] = new[] { CardEffect.DrawHand("Cards", 2) },
+        ["SCRAWL"] = new[] { CardEffect.DrawHand("Cards", 1) },
+        ["SKIM"] = new[] { CardEffect.DrawHand("Cards", 2) },
+        ["SOUL"] = new[] { CardEffect.DrawHand("Cards", 2) },
+        ["COOLHEADED"] = new[] { CardEffect.DrawHand("Cards", 1) },
+        // ---- summon the mirror Osty ----
+        ["AFTERLIFE"] = new[] { CardEffect.SummonOsty("Summon", 1) },
+        ["BODYGUARD"] = new[] { CardEffect.SummonOsty("Summon", 1) },
+        ["DIRGE"] = new[] { CardEffect.SummonOsty("Summon", 1) },
+        ["LEGIONOFBONE"] = new[] { CardEffect.SummonOsty("Summon", 1) },
+        ["REANIMATE"] = new[] { CardEffect.SummonOsty("Summon", 1) },
+        // ---- forge (Necrobinder forge, mirror-player-safe try/catch) ----
+        ["THESMITH"] = new[] { CardEffect.Forge("Forge", 1) },
+        ["SPOILSOFBATTLE"] = new[] { CardEffect.Forge("Forge", 1), CardEffect.DrawHand("Cards", 1) },
+        ["BIGBANG"] = new[] { CardEffect.DrawHand("Cards", 1), CardEffect.EnergyNow("Energy", 1), CardEffect.Forge("Forge", 1) },
     };
 }

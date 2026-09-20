@@ -43,6 +43,8 @@ EXCLUDED_POWERS = {
 # table data (conditional amounts, free-hand sweeps, pending-economy forms).
 SPECIAL_CASES = {
     "BattleTrance", "BulletTime", "OneForAll", "Plot", "Prolong",
+    "Entrench", "DoubleEnergy", "BelieveInYou", "CalculatedGamble",
+    "Cascade", "Havoc", "Sacrifice", "DemonicShield", "Enlightenment",
 }
 
 # Powers cleared by the audit to apply even though the pattern scan flagged

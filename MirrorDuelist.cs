@@ -78,6 +78,10 @@ public sealed class MirrorDuelist : MonsterModel
     private int _pendingDrawBonus;
     private int _pendingBlockBonus;
 
+    // Energy granted mid-turn by played cards (Bloodletting, Offering, ...);
+    // the greedy continuation spends it the same turn.
+    private int _bonusEnergyThisTurn;
+
     // Energy left unspent by the last planning; the turn Perform reuses it to
     // play drawn/bonus cards beyond the declared intent list.
     private int _plannedLeftoverEnergy;
@@ -422,10 +426,18 @@ public sealed class MirrorDuelist : MonsterModel
             // Greedy continuation: cards drawn or kept this turn (Draw vars,
             // cheap leftovers) get played beyond the declared intents while
             // energy remains, exactly like a player spending their turn.
-            int energy = Math.Max(0, _plannedLeftoverEnergy);
+            // Bonus energy from played cards (Bloodletting, Offering...) joins
+            // the leftover budget here.
+            int energy = Math.Max(0, _plannedLeftoverEnergy) + _bonusEnergyThisTurn;
+            _bonusEnergyThisTurn = 0;
             int extra = 0;
-            while (energy > 0 && extra < 8 && hand != null)
+            while (energy > 0 && extra < 12 && hand != null)
             {
+                if (energy > 0 && _bonusEnergyThisTurn != 0)
+                {
+                    energy = Math.Max(0, energy + _bonusEnergyThisTurn);
+                    _bonusEnergyThisTurn = 0;
+                }
                 CardModel? pick = null;
                 foreach (CardModel c in hand.Cards.OrderBy(_ => RunRng.MonsterAi.NextFloat()))
                 {
@@ -1132,6 +1144,44 @@ public sealed class MirrorDuelist : MonsterModel
                     applied = true;
                     break;
                 }
+                case "energy_now":
+                    if (amount > 0m)
+                    {
+                        _bonusEnergyThisTurn += (int)amount;
+                        applied = true;
+                    }
+                    break;
+                case "summon_osty":
+                    if (_mirrorPlayer != null && amount > 0m)
+                    {
+                        await SummonMirrorOsty(ctx, Math.Clamp(amount, 0m, 30m), card);
+                        applied = true;
+                    }
+                    break;
+                case "forge":
+                {
+                    if (_mirrorPlayer == null || amount <= 0m)
+                    {
+                        break;
+                    }
+                    try
+                    {
+                        await ForgeCmd.Forge((int)amount, _mirrorPlayer, card);
+                        applied = true;
+                    }
+                    catch (Exception e)
+                    {
+                        Log.Error($"[MirrorDuelist] forge failed for {card.Id.Entry}: {e}");
+                    }
+                    break;
+                }
+                case "max_hp_loss":
+                    if (amount > 0m)
+                    {
+                        await CreatureCmd.LoseMaxHp(ctx, Creature, amount, isFromCard: true);
+                        applied = true;
+                    }
+                    break;
             }
         }
         return applied;
@@ -1297,6 +1347,120 @@ public sealed class MirrorDuelist : MonsterModel
             case "PROLONG":
             {
                 _pendingBlockBonus += (int)Math.Clamp(Creature.Block, 0m, 999m);
+                return true;
+            }
+            case "ENTRENCH":
+            {
+                await CreatureCmd.GainBlock(Creature, Creature.Block, ValueProp.Unpowered | ValueProp.Move, cardPlay);
+                return true;
+            }
+            case "DOUBLEENERGY":
+            {
+                _bonusEnergyThisTurn += Math.Max(0, _plannedLeftoverEnergy);
+                return true;
+            }
+            case "BELIEVEINYOU":
+            {
+                Player? targetPlayer = target.Player;
+                if (targetPlayer != null)
+                {
+                    int n = card.DynamicVars.ContainsKey("Energy") ? (int)card.DynamicVars.Energy.BaseValue : 2;
+                    await PlayerCmd.GainEnergy(n, targetPlayer);
+                    return true;
+                }
+                return false;
+            }
+            case "CALCULATEDGAMBLE":
+            {
+                CardPile? hand = MirrorPile(PileType.Hand);
+                if (hand == null)
+                {
+                    return false;
+                }
+                int count = hand.Cards.Count;
+                foreach (CardModel c in hand.Cards.ToList())
+                {
+                    hand.RemoveInternal(c);
+                    CardPile? discard = MirrorPile(PileType.Discard);
+                    if (discard != null && !discard.Cards.Contains(c))
+                    {
+                        discard.AddInternal(c);
+                    }
+                }
+                DrawFromMirrorDrawIntoHand(count);
+                return true;
+            }
+            case "CASCADE":
+            case "HAVOC":
+            {
+                CardPile? draw = MirrorPile(PileType.Draw);
+                if (draw == null || draw.Cards.Count == 0)
+                {
+                    return false;
+                }
+                CardModel top = draw.Cards[^1];
+                draw.RemoveInternal(top);
+                if (!MirrorCardEffects.Table.ContainsKey(NormalizedId(top)) && top.Type != CardType.Attack
+                    && !top.DynamicVars.ContainsKey("Damage") && !top.DynamicVars.ContainsKey("Block")
+                    && !top.DynamicVars.ContainsKey("CalculatedBlock"))
+                {
+                    // The real pipeline risks hand-UI deadlocks; only auto-play
+                    // cards the safe interpreter can express.
+                    CardPile? discard = MirrorPile(PileType.Discard);
+                    if (discard != null && !discard.Cards.Contains(top))
+                    {
+                        discard.AddInternal(top);
+                    }
+                    return NormalizedId(card) == "CASCADE";
+                }
+                await PlayTurnCard(top, target);
+                if (NormalizedId(card) == "HAVOC")
+                {
+                    CardPile? exhaust = MirrorPile(PileType.Exhaust);
+                    foreach (CardPile? p in new[] { MirrorPile(PileType.Discard), MirrorPile(PileType.Hand), MirrorPile(PileType.Play) })
+                    {
+                        if (exhaust != null && p != null && p.Cards.Contains(top))
+                        {
+                            p.RemoveInternal(top);
+                            exhaust.AddInternal(top);
+                        }
+                    }
+                }
+                return true;
+            }
+            case "SACRIFICE":
+            {
+                if (_mirrorOsty != null && _mirrorOsty.IsAlive)
+                {
+                    await CreatureCmd.Kill(_mirrorOsty);
+                    return true;
+                }
+                return false;
+            }
+            case "DEMONICSHIELD":
+            {
+                decimal block = BlockOf(card, target);
+                if (block > 0m)
+                {
+                    await CreatureCmd.GainBlock(target, block, ValueProp.Unpowered | ValueProp.Move, cardPlay);
+                    return true;
+                }
+                return false;
+            }
+            case "ENLIGHTENMENT":
+            {
+                CardPile? hand = MirrorPile(PileType.Hand);
+                if (hand == null)
+                {
+                    return false;
+                }
+                foreach (CardModel c in hand.Cards.ToList())
+                {
+                    if (!c.EnergyCost.CostsX)
+                    {
+                        c.EnergyCost.SetThisTurnOrUntilPlayed(1, reduceOnly: true);
+                    }
+                }
                 return true;
             }
             default:

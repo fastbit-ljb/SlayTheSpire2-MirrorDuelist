@@ -638,15 +638,6 @@
   "onplay_len": 136
  },
  {
-  "id": "ETERNALARMOR",
-  "file": "EternalArmor",
-  "type": "Power",
-  "reasons": [
-   "APPLY_NOT_IN_TABLE"
-  ],
-  "onplay_len": 146
- },
- {
   "id": "EXPECTAFIGHT",
   "file": "ExpectAFight",
   "type": "Skill",
@@ -672,24 +663,6 @@
    "APPLY_NOT_IN_TABLE"
   ],
   "onplay_len": 247
- },
- {
-  "id": "FETCH",
-  "file": "Fetch",
-  "type": "Attack",
-  "reasons": [
-   "ATTACK_CUSTOM_DMG"
-  ],
-  "onplay_len": 487
- },
- {
-  "id": "FLATTEN",
-  "file": "Flatten",
-  "type": "Attack",
-  "reasons": [
-   "ATTACK_CUSTOM_DMG"
-  ],
-  "onplay_len": 357
  },
  {
   "id": "FOLLY",
@@ -929,15 +902,6 @@
   "onplay_len": 466
  },
  {
-  "id": "INFERNO",
-  "file": "Inferno",
-  "type": "Power",
-  "reasons": [
-   "APPLY_NOT_IN_TABLE"
-  ],
-  "onplay_len": 276
- },
- {
   "id": "INFINITEBLADES",
   "file": "InfiniteBlades",
   "type": "Power",
@@ -1019,15 +983,6 @@
    "UNIQUE_EFFECT"
   ],
   "onplay_len": 444
- },
- {
-  "id": "LETHALITY",
-  "file": "Lethality",
-  "type": "Power",
-  "reasons": [
-   "APPLY_NOT_IN_TABLE"
-  ],
-  "onplay_len": 255
  },
  {
   "id": "LOOP",
@@ -1148,15 +1103,6 @@
   "onplay_len": 308
  },
  {
-  "id": "NEUTRONAEGIS",
-  "file": "NeutronAegis",
-  "type": "Power",
-  "reasons": [
-   "APPLY_NOT_IN_TABLE"
-  ],
-  "onplay_len": 147
- },
- {
   "id": "NIGHTMARE",
   "file": "Nightmare",
   "type": "Skill",
@@ -1274,15 +1220,6 @@
   "onplay_len": 263
  },
  {
-  "id": "PIERCINGWAIL",
-  "file": "PiercingWail",
-  "type": "Skill",
-  "reasons": [
-   "APPLY_NOT_IN_TABLE"
-  ],
-  "onplay_len": 324
- },
- {
   "id": "PLOT",
   "file": "Plot",
   "type": "Skill",
@@ -1290,15 +1227,6 @@
    "APPLY_NOT_IN_TABLE"
   ],
   "onplay_len": 340
- },
- {
-  "id": "POKE",
-  "file": "Poke",
-  "type": "Attack",
-  "reasons": [
-   "ATTACK_CUSTOM_DMG"
-  ],
-  "onplay_len": 400
  },
  {
   "id": "POORSLEEP",
@@ -1456,15 +1384,6 @@
   "onplay_len": 237
  },
  {
-  "id": "RIGHTHANDHAND",
-  "file": "RightHandHand",
-  "type": "Attack",
-  "reasons": [
-   "ATTACK_CUSTOM_DMG"
-  ],
-  "onplay_len": 357
- },
- {
   "id": "ROLLINGBOULDER",
   "file": "RollingBoulder",
   "type": "Power",
@@ -1562,16 +1481,6 @@
    "UNIQUE_EFFECT"
   ],
   "onplay_len": 89
- },
- {
-  "id": "SNAP",
-  "file": "Snap",
-  "type": "Attack",
-  "reasons": [
-   "ATTACK_CUSTOM_DMG",
-   "UI_SELECT"
-  ],
-  "onplay_len": 705
  },
  {
   "id": "SOUL",
@@ -1676,15 +1585,6 @@
   "onplay_len": 712
  },
  {
-  "id": "STONEARMOR",
-  "file": "StoneArmor",
-  "type": "Power",
-  "reasons": [
-   "APPLY_NOT_IN_TABLE"
-  ],
-  "onplay_len": 147
- },
- {
   "id": "STORM",
   "file": "Storm",
   "type": "Power",
@@ -1737,15 +1637,6 @@
    "UNIQUE_EFFECT"
   ],
   "onplay_len": 182
- },
- {
-  "id": "SWEEPINGGAZE",
-  "file": "SweepingGaze",
-  "type": "Attack",
-  "reasons": [
-   "ATTACK_CUSTOM_DMG"
-  ],
-  "onplay_len": 300
  },
  {
   "id": "SWORDSAGE",
