@@ -64,7 +64,7 @@ Press `` ` `` in-game:
 
 ## Status
 
-Test version (v0.6.6), installed locally. Star-resource support is enabled;
+Test version (v0.6.8), installed locally. Star-resource support is enabled;
 the remaining unsupported cards are catalogued in `UNIMPLEMENTED.md`.
 
 Coverage: ~74% of all 575 stealable cards have real effects on the duelist
