@@ -23,6 +23,8 @@ mirrors the player.
     (71 blacklisted) and resolve as harmless duds.
   - Next-turn resource powers (energy/draw/block) feed the interpreter's own
     pending economy for the following turn.
+  - The mirror starts combat with **10 stars**. Star-cost cards spend the
+    mirror's real combat star resource; Regent star-gain cards replenish it.
   - Generated cards (Shivs, Discovery) are played by the duelist, never given
     to the player; recursion is capped (depth 4, 12 per turn).
   - Powers are single-use (exhaust), exhaust cards leave the pool, a pool down
@@ -62,7 +64,8 @@ Press `` ` `` in-game:
 
 ## Status
 
-Test version (v0.5.0), installed locally, not on the Workshop yet.
+Test version (v0.6.6), installed locally. Star-resource support is enabled;
+the remaining unsupported cards are catalogued in `UNIMPLEMENTED.md`.
 
 Coverage: ~74% of all 575 stealable cards have real effects on the duelist
 (power table 168 + effect table 37 + bespoke specials 16 + the var-driven

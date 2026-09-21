@@ -59,6 +59,10 @@ public sealed class MirrorDuelist : MonsterModel
     private const float HpMultiplier = 1.5f;
     private const int StealCount = 3;
     private const int TurnEnergy = 5;
+    // The mirror owns a real PlayerCombatState so Regent-style star cards can
+    // use their actual resource instead of being treated as harmless duds.
+    // Stars persist between turns just like they do for the Regent player.
+    private const int InitialStars = 10;
     private const float CardScale = 0.55f;
     private const string MoveId = "MIRROR_PLAY_MOVE";
     private const string StealMoveId = "MIRROR_STEAL_MOVE";
@@ -141,6 +145,12 @@ public sealed class MirrorDuelist : MonsterModel
                 // resolve their CombatState while being played.
                 _mirrorPlayer.ResetCombatState();
                 _mirrorPlayer.PopulateCombatState(real!.RunState.Rng.Shuffle, combatState);
+                // A copied player is not registered in the normal player-turn
+                // setup, so CombatManager would otherwise leave its star
+                // counter at zero.  Give the monster its requested starting
+                // pool after the combat piles have been populated.
+                await PlayerCmd.SetStars(InitialStars, _mirrorPlayer);
+                Log.Info($"[MirrorDuelist] mirror resource initialized: {InitialStars} stars.");
             }
             catch (Exception e)
             {
@@ -449,7 +459,7 @@ public sealed class MirrorDuelist : MonsterModel
                 CardModel? pick = null;
                 foreach (CardModel c in hand.Cards.OrderBy(_ => RunRng.MonsterAi.NextFloat()))
                 {
-                    if (PlayCost(c) <= energy)
+                    if (PlayCost(c) <= energy && HasMirrorStarsFor(c))
                     {
                         pick = c;
                         break;
@@ -541,6 +551,7 @@ public sealed class MirrorDuelist : MonsterModel
         }
         var order = hand.Cards.OrderBy(_ => RunRng.MonsterAi.NextFloat()).ToList();
         var plays = new List<CardModel?>();
+        int availableStars = CurrentMirrorStars();
         bool progress = true;
         while (energy > 0 && order.Count > 0 && progress)
         {
@@ -548,10 +559,12 @@ public sealed class MirrorDuelist : MonsterModel
             foreach (CardModel card in order)
             {
                 int cost = PlayCost(card);
-                if (cost <= energy)
+                int starCost = MirrorStarCost(card);
+                if (cost <= energy && starCost <= availableStars)
                 {
                     plays.Add(card);
                     energy -= cost;
+                    availableStars -= starCost;
                     order.Remove(card);
                     hand.RemoveInternal(card);
                     progress = true;
@@ -560,9 +573,12 @@ public sealed class MirrorDuelist : MonsterModel
             }
         }
         // Spec: with the whole pool down to a single card, it is played twice.
-        if (plays.Count == 1 && draw.Cards.Count == 0 && hand.Cards.Count == 0 && discard.Cards.Count == 0)
+        CardModel? onlyPlay = plays.Count == 1 ? plays[0] : null;
+        if (onlyPlay != null && draw.Cards.Count == 0 && hand.Cards.Count == 0 && discard.Cards.Count == 0 &&
+            MirrorStarCost(onlyPlay) <= availableStars)
         {
-            plays.Add(plays[0]);
+            plays.Add(onlyPlay);
+            availableStars -= MirrorStarCost(onlyPlay);
         }
         _plannedLeftoverEnergy = energy;
         return plays;
@@ -582,6 +598,45 @@ public sealed class MirrorDuelist : MonsterModel
     {
         int cost = card.CurrentStarCost;
         return Math.Clamp(cost < 0 ? 1 : cost, 0, TurnEnergy);
+    }
+
+    private int CurrentMirrorStars()
+    {
+        return Math.Max(0, _mirrorPlayer?.PlayerCombatState?.Stars ?? 0);
+    }
+
+    private static int MirrorStarCost(CardModel card)
+    {
+        // A negative canonical cost means that the card does not use stars.
+        // GetStarCostWithModifiers also accounts for temporary effects such as
+        // Enlightenment and generated free cards.
+        return Math.Max(0, card.GetStarCostWithModifiers());
+    }
+
+    private bool HasMirrorStarsFor(CardModel card)
+    {
+        return MirrorStarCost(card) <= CurrentMirrorStars();
+    }
+
+    private async Task<bool> SpendMirrorStars(CardModel card)
+    {
+        if (_mirrorPlayer == null)
+        {
+            return false;
+        }
+        int amount = MirrorStarCost(card);
+        card.LastStarsSpent = amount;
+        if (amount <= 0)
+        {
+            return true;
+        }
+        if (amount > CurrentMirrorStars())
+        {
+            Log.Info($"[MirrorDuelist] skipped {card.Id.Entry}: needs {amount} stars, has {CurrentMirrorStars()}.");
+            return false;
+        }
+        await PlayerCmd.LoseStars(amount, _mirrorPlayer);
+        return true;
     }
 
     // ---- translation layer ----
@@ -713,13 +768,18 @@ public sealed class MirrorDuelist : MonsterModel
         {
             DynamicVarSet vars = card.DynamicVars;
             int cost = PlayCost(card);
+            if (!await SpendMirrorStars(card))
+            {
+                break;
+            }
+            int starCost = MirrorStarCost(card);
             var cardPlay = new CardPlay
             {
                 Card = card,
                 Player = card.Owner!,
                 Target = target,
                 ResultPile = PileType.Discard,
-                Resources = new ResourceInfo { EnergySpent = 0, EnergyValue = cost, StarsSpent = 0, StarValue = cost },
+                Resources = new ResourceInfo { EnergySpent = 0, EnergyValue = cost, StarsSpent = starCost, StarValue = starCost },
                 IsAutoPlay = true,
                 PlayIndex = i,
                 PlayCount = playCount,
@@ -1349,6 +1409,10 @@ public sealed class MirrorDuelist : MonsterModel
         {
             return true;
         }
+        // Regent cards use the star resource directly. Keep this separate
+        // from the generated effect table so a card can gain stars and still
+        // perform its normal damage/block/draw effect in the same play.
+        bool starEffectApplied = await ApplyMirrorStarCardEffect(card, target);
         switch (NormalizedId(card))
         {
             // Generated-card cards: make the same random choices as vanilla,
@@ -1396,6 +1460,29 @@ public sealed class MirrorDuelist : MonsterModel
                 int shivs = card.DynamicVars.ContainsKey("Shivs") ? card.DynamicVars["Shivs"].IntValue : 2;
                 await AddMirrorShivs(card, target, shivs, enchanted: false, playImmediately: false,
                     upgraded: card.IsUpgraded);
+                return true;
+            }
+            case "HIDDENCACHE":
+            {
+                // Hidden Cache also banks stars for the next turn. Its
+                // vanilla implementation applies a player hook, so apply
+                // the real power to the mirror creature explicitly.
+                Type? powerType = ResolvePowerModel("StarNextTurnPower");
+                if (powerType != null)
+                {
+                    try
+                    {
+                        PowerModel canonical = ModelDb.DebugPower(powerType);
+                        decimal amount = card.DynamicVars.ContainsKey("StarNextTurnPower")
+                            ? card.DynamicVars["StarNextTurnPower"].BaseValue
+                            : 3m;
+                        await PowerCmd.Apply(ctx, canonical.ToMutable(), Creature, amount, Creature, card);
+                    }
+                    catch (Exception e)
+                    {
+                        Log.Error($"[MirrorDuelist] Hidden Cache star power failed: {e}");
+                    }
+                }
                 return true;
             }
             case "BUNDLEOFJOY":
@@ -1822,8 +1909,43 @@ public sealed class MirrorDuelist : MonsterModel
                 return false;
             }
             default:
-                return false;
+                return starEffectApplied;
         }
+    }
+
+    /// <summary>
+    /// Applies deterministic star-gain portions of Regent cards. These cards
+    /// were previously unsupported because the mirror player had no combat
+    /// star pool at all.
+    /// </summary>
+    private async Task<bool> ApplyMirrorStarCardEffect(CardModel card, Creature target)
+    {
+        if (_mirrorPlayer == null)
+        {
+            return false;
+        }
+        string id = NormalizedId(card);
+        bool shouldGain = id is "BIGBANG" or "GATHERLIGHT" or "GLOW" or
+            "HIDDENCACHE" or "ROYALGAMBLE" or "SHININGSTRIKE" or
+            "SOLARSTRIKE" or "VENERATE";
+        // Knockout Blow grants stars only when its attack kills. The attack
+        // portion has already resolved before this helper is called.
+        if (id == "KNOCKOUTBLOW")
+        {
+            shouldGain = target.IsDead;
+        }
+        if (!shouldGain || !card.DynamicVars.ContainsKey("Stars"))
+        {
+            return false;
+        }
+        int amount = Math.Max(0, card.DynamicVars.Stars.IntValue);
+        if (amount <= 0)
+        {
+            return false;
+        }
+        await PlayerCmd.GainStars(amount, _mirrorPlayer);
+        Log.Info($"[MirrorDuelist] {id} gained {amount} stars (now {CurrentMirrorStars()}).");
+        return true;
     }
 
     /// <summary>
