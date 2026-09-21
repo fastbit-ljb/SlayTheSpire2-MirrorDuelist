@@ -151,36 +151,30 @@
 - Chaos —— 金币/药水/奖励层操作
 - HiddenGem —— 金币/药水/奖励层操作
 
-## 部分实现（4 张）
+## 部分实现（3 张）
 
 - CaptureSpirit —— 主效果已翻译，生成/放置卡牌的支线无法无UI等价实现
 - GlimpseBeyond —— 主效果已翻译，生成/放置卡牌的支线无法无UI等价实现
-- Reboot —— 主效果已翻译，生成/放置卡牌的支线无法无UI等价实现
 - SummonForth —— 主效果已翻译，生成/放置卡牌的支线无法无UI等价实现
 
-## 需要选牌UI（25 张）
+## 需要选牌UI（20 张；5 张已改为自动选择）
 
-- Abundance —— 等待玩家选卡会死锁怪物回合
 - Acrobatics —— 等待玩家选卡会死锁怪物回合
 - Begone —— 等待玩家选卡会死锁怪物回合
 - BurningPact —— 等待玩家选卡会死锁怪物回合
 - Charge —— 等待玩家选卡会死锁怪物回合
-- Cleanse —— 等待玩家选卡会死锁怪物回合
-- DecisionsDecisions —— 等待玩家选卡会死锁怪物回合
 - Discovery —— 等待玩家选卡会死锁怪物回合
 - Dredge —— 等待玩家选卡会死锁怪物回合
 - DualWield —— 等待玩家选卡会死锁怪物回合
 - Glimmer —— 等待玩家选卡会死锁怪物回合
 - Guards —— 等待玩家选卡会死锁怪物回合
 - HiddenDaggers —— 等待玩家选卡会死锁怪物回合
-- Nightmare —— 等待玩家选卡会死锁怪物回合
 - Prepared —— 等待玩家选卡会死锁怪物回合
 - Purity —— 等待玩家选卡会死锁怪物回合
 - Quasar —— 等待玩家选卡会死锁怪物回合
 - Seance —— 等待玩家选卡会死锁怪物回合
 - SecretTechnique —— 等待玩家选卡会死锁怪物回合
 - SecretWeapon —— 等待玩家选卡会死锁怪物回合
-- Splash —— 等待玩家选卡会死锁怪物回合
 - ThinkingAhead —— 等待玩家选卡会死锁怪物回合
 - Transfigure —— 等待玩家选卡会死锁怪物回合
 - Tutor —— 等待玩家选卡会死锁怪物回合
