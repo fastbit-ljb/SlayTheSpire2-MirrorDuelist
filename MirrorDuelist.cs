@@ -2610,7 +2610,7 @@ public sealed class MirrorDuelist : MonsterModel
         {
             return;
         }
-        while (n > 0 && draw.Cards.Count > 0)
+        while (n > 0)
         {
             if (draw.Cards.Count == 0 && MirrorPile(PileType.Discard) is { } discard && discard.Cards.Count > 0)
             {
@@ -2624,6 +2624,10 @@ public sealed class MirrorDuelist : MonsterModel
                 {
                     draw.AddInternal(c);
                 }
+            }
+            if (draw.Cards.Count == 0)
+            {
+                break;
             }
             CardModel top = draw.Cards[^1];
             draw.RemoveInternal(top);
