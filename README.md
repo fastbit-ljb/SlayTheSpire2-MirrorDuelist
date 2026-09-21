@@ -27,6 +27,14 @@ mirrors the player.
     mirror's real combat star resource; Regent star-gain cards replenish it.
   - Generated cards (Shivs, Discovery) are played by the duelist, never given
     to the player; recursion is capped (depth 4, 12 per turn).
+  - Selection cards use deterministic AI choices instead of opening a player
+    screen (`Abundance`, `Cleanse`, `DecisionsDecisions`, `Nightmare`, `Splash`).
+  - AOE attacks now use the real player-side target list, low-damage cards no
+    longer receive an artificial six-damage floor, and common pile cards such
+    as `AllForOne`, `FiendFire`, `Reboot`, `Scrape`, `Pillage`, `Claw`, `Maul`,
+    `BeatIntoShape` and `DrainPower` have dedicated translations.
+  - Storm/Loop/Thunder/Hailstorm/Spinner/Consuming Shadow orb powers are
+    attached to the mirror and advanced through enemy-turn-safe hooks.
   - Powers are single-use (exhaust), exhaust cards leave the pool, a pool down
     to one card plays it twice, an empty pool falls back to Strikes.
 - `CombatState.HittableEnemies` is redirected to the player side during the

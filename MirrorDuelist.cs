@@ -495,7 +495,6 @@ public sealed class MirrorDuelist : MonsterModel
                     }
                 }
             }
-            await ApplyMirrorTurnEndPowers(ctx);
         }
 
         return new MirrorMoveState(this, stateId, Perform, intents.ToArray());
@@ -2396,51 +2395,6 @@ public sealed class MirrorDuelist : MonsterModel
         }
     }
 
-    private async Task ApplyMirrorTurnEndPowers(PlayerChoiceContext ctx)
-    {
-        if (_mirrorPlayer?.PlayerCombatState == null || Creature.CombatState == null)
-        {
-            return;
-        }
-        HailstormPower? hailstorm = Creature.GetPower<HailstormPower>();
-        if (hailstorm != null)
-        {
-            int required = hailstorm.DynamicVars.ContainsKey(HailstormPower.frostOrbKey)
-                ? hailstorm.DynamicVars[HailstormPower.frostOrbKey].IntValue
-                : HailstormPower.frostOrbCount;
-            int frost = _mirrorPlayer.PlayerCombatState.OrbQueue.Orbs.Count(o => o is FrostOrb);
-            if (frost >= required)
-            {
-                await CreatureCmd.Damage(ctx, MirrorEnemyTargets(Creature), hailstorm.Amount,
-                    ValueProp.Unpowered, Creature);
-            }
-        }
-        ConsumingShadowPower? shadow = Creature.GetPower<ConsumingShadowPower>();
-        if (shadow != null)
-        {
-            for (int i = 0; i < shadow.Amount && _mirrorPlayer.PlayerCombatState.OrbQueue.Orbs.Count > 0; i++)
-            {
-                OrbModel? last = _mirrorPlayer.PlayerCombatState.OrbQueue.Orbs.LastOrDefault();
-                await OrbCmd.EvokeLast(ctx, _mirrorPlayer);
-                if (last != null)
-                {
-                    await ApplyMirrorThunderDamage(ctx, last);
-                }
-            }
-        }
-    }
-
-    private async Task ApplyMirrorThunderDamage(PlayerChoiceContext ctx, OrbModel orb)
-    {
-        ThunderPower? thunder = Creature.GetPower<ThunderPower>();
-        if (thunder == null || orb is not LightningOrb)
-        {
-            return;
-        }
-        await CreatureCmd.Damage(ctx, MirrorEnemyTargets(Creature), thunder.Amount,
-            ValueProp.Unpowered, Creature);
-    }
-
     private async Task ChannelMirrorOrb<T>(PlayerChoiceContext ctx) where T : OrbModel
     {
         await OrbCmd.Channel<T>(ctx, _mirrorPlayer!);
@@ -2452,9 +2406,7 @@ public sealed class MirrorDuelist : MonsterModel
         count = Math.Max(0, count);
         for (int i = 0; i < count && _mirrorPlayer!.PlayerCombatState!.OrbQueue.Orbs.Count > 0; i++)
         {
-            OrbModel orb = _mirrorPlayer.PlayerCombatState.OrbQueue.Orbs[0];
             await OrbCmd.EvokeNext(ctx, _mirrorPlayer!, dequeue: i == count - 1);
-            await ApplyMirrorThunderDamage(ctx, orb);
         }
     }
 
