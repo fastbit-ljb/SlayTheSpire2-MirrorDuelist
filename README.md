@@ -72,7 +72,11 @@ Press `` ` `` in-game:
 
 ## Status
 
-Test version (v0.6.8), installed locally. Star-resource support is enabled;
+Test version (v0.6.9), installed locally. Star-resource support is enabled;
+v0.6.9 fixes the attack command builder calling `TargetingAllOpponents` twice
+for AOE cards. Single-target attacks now use the mirror player's bound
+creature and explicit target, so a failed target setup no longer turns the
+whole enemy turn into duds.
 the remaining unsupported cards are catalogued in `UNIMPLEMENTED.md`.
 
 Coverage: ~74% of all 575 stealable cards have real effects on the duelist
