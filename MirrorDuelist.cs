@@ -2867,21 +2867,39 @@ public sealed class MirrorDuelist : MonsterModel
         {
             attack = attack.FromOsty(_mirrorOsty, card, cardPlay)
                 .WithHitFx("vfx/vfx_attack_blunt");
+            if (card.TargetType == TargetType.AllEnemies && Creature.CombatState != null)
+            {
+                attack.TargetingAllOpponents(Creature.CombatState);
+            }
+            else
+            {
+                attack.Targeting(target);
+            }
         }
-        else
+        else if (card.TargetType == TargetType.AllEnemies && Creature.CombatState != null)
         {
+            // FromMonster already calls TargetingAllOpponents internally.  The
+            // previous code called it a second time here, which throws
+            // "Already set to target opponents of attacker" and turns the
+            // entire mirror turn into a dud.  Keep the vanilla builder chain
+            // intact and only add the explicit target for single-target cards.
             attack = attack.FromMonster(this)
                 .WithAttackerAnim("Attack", 0.3f)
                 .WithAttackerFx(null, AttackSfxPath)
                 .WithHitFx("vfx/vfx_attack_blunt");
         }
-        if (card.TargetType == TargetType.AllEnemies && Creature.CombatState != null)
-        {
-            attack.TargetingAllOpponents(Creature.CombatState);
-        }
         else
         {
-            attack.Targeting(target);
+            // FromMonster is intentionally an all-opponents helper.  For a
+            // single-target mirror attack use FromCard instead; the synthetic
+            // mirror Player is bound to this same creature, so the command
+            // still records the duelist as the attacker while allowing an
+            // explicit target to be selected.
+            attack = attack.FromCard(card, cardPlay)
+                .WithAttackerAnim("Attack", 0.3f)
+                .WithAttackerFx(null, AttackSfxPath)
+                .WithHitFx("vfx/vfx_attack_blunt")
+                .Targeting(target);
         }
         await attack.Execute(ctx);
     }
