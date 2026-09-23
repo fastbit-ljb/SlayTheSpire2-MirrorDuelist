@@ -473,6 +473,8 @@ public sealed class MirrorDuelist : MonsterModel
             if (UseNativeVakuuAutoplay && _mirrorPlayer != null &&
                 await TryNativeVakuuTurn(plays, ctx))
             {
+                _bonusEnergyThisTurn = 0;
+                _plannedLeftoverEnergy = 0;
                 return;
             }
             foreach (CardModel? card in plays)
