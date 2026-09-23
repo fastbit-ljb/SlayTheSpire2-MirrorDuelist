@@ -11,8 +11,13 @@ mirrors the player.
   (Thieving Hopper parity: the deck version is pulled out of the run deck too).
   Weighted: attack > power > skill > curse, uncommon > common > rare; at most
   one copy of each card.
-- Stolen cards hang above the duelist. Each turn it draws up to 5 and spends
-  **5 energy** playing them at the player through a UI-free interpreter:
+- Stolen cards hang above the duelist. Each turn it draws up to 5 and gives a
+  hidden synthetic player a Vakuu-style auto-play relic. Cards are primarily
+  resolved through the **vanilla `CardModel.OnPlayWrapper` pipeline** (with a
+  deterministic `VakuuCardSelector` and a 64-card recursion guard), so card
+  hooks, replay, generated cards and native power logic run as they do for a
+  player. The old UI-free interpreter remains a fallback for cards that cannot
+  be safely auto-played during an enemy turn:
   - Attacks hit with printed damage/hit counts (incl. Shiv + Accuracy,
     Unleash scaling off the mirrored Osty).
   - Block skills grant it block; self HP-loss costs (Breakthrough) apply.
@@ -72,7 +77,7 @@ Press `` ` `` in-game:
 
 ## Status
 
-Test version (v0.6.9), installed locally. Star-resource support is enabled;
+Test version (v0.7.0), installed locally. Star-resource support is enabled;
 v0.6.9 fixes the attack command builder calling `TargetingAllOpponents` twice
 for AOE cards. Single-target attacks now use the mirror player's bound
 creature and explicit target, so a failed target setup no longer turns the

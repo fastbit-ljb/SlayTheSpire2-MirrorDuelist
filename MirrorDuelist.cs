@@ -24,6 +24,7 @@ using MegaCrit.Sts2.Core.Models.Enchantments;
 using MegaCrit.Sts2.Core.Models.Monsters;
 using MegaCrit.Sts2.Core.Models.Orbs;
 using MegaCrit.Sts2.Core.Models.Powers;
+using MegaCrit.Sts2.Core.Models.Relics;
 using MegaCrit.Sts2.Core.MonsterMoves.Intents;
 using MegaCrit.Sts2.Core.MonsterMoves.MonsterMoveStateMachine;
 using MegaCrit.Sts2.Core.Nodes.Cards;
@@ -67,6 +68,13 @@ public sealed class MirrorDuelist : MonsterModel
     // use their actual resource instead of being treated as harmless duds.
     // Stars persist between turns just like they do for the Regent player.
     private const int InitialStars = 10;
+    // Keep the real player-side CardModel pipeline enabled for the mirror.
+    // The synthetic Player is deliberately not registered in CombatState
+    // (doing so makes CombatManager wait for a non-existent extra player), so
+    // we drive the same Vakuu/Whispering Earring loop from the enemy turn.
+    private const bool UseNativeVakuuAutoplay = true;
+    private const int NativeEnergyPerCycle = TurnEnergy;
+    private const int NativeAutoplayCap = 64;
     private const float CardScale = 0.55f;
     private const string MoveId = "MIRROR_PLAY_MOVE";
     private const string StealMoveId = "MIRROR_STEAL_MOVE";
@@ -154,6 +162,18 @@ public sealed class MirrorDuelist : MonsterModel
                 // counter at zero.  Give the monster its requested starting
                 // pool after the combat piles have been populated.
                 await PlayerCmd.SetStars(InitialStars, _mirrorPlayer);
+                // Vakuu is the vanilla relic that owns the automatic card
+                // selection path.  We keep it on the synthetic player so
+                // card hooks that inspect the owner's relics see the same
+                // setup as the real player.  Its vanilla hook is capped at
+                // 13 cards; the enemy driver below intentionally removes
+                // that cap while retaining a hard recursion guard.
+                if (_mirrorPlayer.GetRelic<WhisperingEarring>() == null)
+                {
+                    _mirrorPlayer.AddRelicInternal(
+                        ModelDb.Relic<WhisperingEarring>().ToMutable(),
+                        silent: true);
+                }
                 Log.Info($"[MirrorDuelist] mirror resource initialized: {InitialStars} stars.");
             }
             catch (Exception e)
@@ -443,6 +463,18 @@ public sealed class MirrorDuelist : MonsterModel
                 _pendingBlockBonus = 0;
                 await CreatureCmd.GainBlock(Creature, block, ValueProp.Move, null);
             }
+            // Run the actual CardModel.OnPlay pipeline through the same
+            // deterministic selector used by Whispering Earring (Vakuu).
+            // This is deliberately a private enemy-turn driver instead of
+            // registering a second Player in CombatState: CombatManager would
+            // then wait for a real network/player turn and can hang or break
+            // save-and-exit.  If the synthetic player could not be created,
+            // retain the old UI-free interpreter as a safe fallback.
+            if (UseNativeVakuuAutoplay && _mirrorPlayer != null &&
+                await TryNativeVakuuTurn(plays, ctx))
+            {
+                return;
+            }
             foreach (CardModel? card in plays)
             {
                 await PlayTurnCard(card, target);
@@ -498,6 +530,222 @@ public sealed class MirrorDuelist : MonsterModel
         }
 
         return new MirrorMoveState(this, stateId, Perform, intents.ToArray());
+    }
+
+    /// <summary>
+    /// Runs stolen cards through the game's own CardModel.OnPlayWrapper path.
+    /// This is the important difference from the legacy translation table:
+    /// card hooks, replay, powers, generated cards and card-specific math all
+    /// execute exactly as they do for a player.  Vakuu's selector is installed
+    /// while the loop is active, so ordinary card-selection effects choose a
+    /// deterministic option instead of opening the player's UI.
+    ///
+    /// The synthetic player is intentionally kept out of CombatState.  Adding
+    /// it there changes PlayerCreatures and makes the turn manager wait for a
+    /// second human/network player.  From the card engine's point of view the
+    /// owner is still a real Player with a real PlayerCombatState and relics;
+    /// from CombatManager's point of view this remains one enemy turn.
+    /// </summary>
+    private async Task<bool> TryNativeVakuuTurn(IReadOnlyList<CardModel?> planned, PlayerChoiceContext choiceContext)
+    {
+        Player? player = _mirrorPlayer;
+        PlayerCombatState? combatPlayer = player?.PlayerCombatState;
+        CardPile? hand = MirrorPile(PileType.Hand);
+        CardPile? discard = MirrorPile(PileType.Discard);
+        ICombatState? combatState = Creature.CombatState;
+        if (player == null || combatPlayer == null || hand == null || discard == null || combatState == null)
+        {
+            return false;
+        }
+
+        // TakePlays removes the cards used for the displayed intents from the
+        // hand.  Native autoplay expects them to still be in the hand, so put
+        // those same instances back before selecting cards (never duplicate a
+        // card: the one-card pool intentionally appears twice in `planned`).
+        foreach (CardModel card in planned.OfType<CardModel>().Distinct())
+        {
+            if (hand.Cards.Contains(card))
+            {
+                continue;
+            }
+            if (card.Pile != null && card.Pile != hand)
+            {
+                card.RemoveFromCurrentPile(silent: true);
+            }
+            if (card.Pile == null)
+            {
+                await CardPileCmd.Add(card, hand, skipVisuals: true);
+            }
+        }
+
+        if (hand.IsEmpty)
+        {
+            // Let the old path produce its normal Strike fallback when there
+            // are no stolen cards at all.
+            return false;
+        }
+
+        int energyRefresh = NativeEnergyRefresh(hand);
+        combatPlayer.Energy = energyRefresh;
+        int played = 0;
+        bool hadPlayableCard = false;
+
+        // This is the only intentional deviation from WhisperingEarring:
+        // vanilla stops at 13 cards, while the mirror keeps refreshing its
+        // turn energy and continues until the hand is empty.  The cap is a
+        // last-resort recursion guard for cards that generate themselves.
+        using (CardSelectCmd.PushSelector(new VakuuCardSelector()))
+        {
+            for (int safety = 0; safety < NativeAutoplayCap; safety++)
+            {
+                if (CombatManager.Instance.IsOverOrEnding || Creature.IsDead)
+                {
+                    break;
+                }
+
+                CardModel? card = hand.Cards
+                    .Where(c => NativeTargetAvailable(c, combatState))
+                    .FirstOrDefault(c => c.CanPlay());
+                if (card == null)
+                {
+                    // A normal card may simply need another five-energy
+                    // cycle.  If every remaining card is blocked by its own
+                    // logic, a second scan will still be empty and we stop.
+                    if (combatPlayer.Energy < energyRefresh)
+                    {
+                        combatPlayer.Energy = energyRefresh;
+                        continue;
+                    }
+                    break;
+                }
+
+                hadPlayableCard = true;
+                Creature? target = NativeTargetFor(card, combatState);
+                try
+                {
+                    await card.SpendResources();
+                    await CardCmd.AutoPlay(
+                        choiceContext,
+                        card,
+                        target,
+                        AutoPlayType.Default,
+                        skipXCapture: true,
+                        skipCardPileVisuals: true);
+                    played++;
+                }
+                catch (Exception e)
+                {
+                    // Some cards still contain a genuinely player-only
+                    // choice.  Do not let that choice freeze the enemy turn;
+                    // file the card safely and continue with the next one.
+                    Log.Error($"[MirrorDuelist] native Vakuu play failed for {card.Id.Entry}: {e}");
+                    await MoveNativeFailureToDiscard(card, discard);
+                    played++;
+                }
+
+                // Native OnPlayWrapper owns the pile transition, but the
+                // mirror's stolen-card node is still parented above the
+                // monster.  Reuse the existing visual settlement/cleanup so
+                // powers and exhaust cards do not leave ghost cards behind.
+                SettleVisual(card, _cardNodes.GetValueOrDefault(card));
+
+                if (combatPlayer.Energy <= 0)
+                {
+                    combatPlayer.Energy = energyRefresh;
+                }
+            }
+        }
+
+        // If every card was blocked before a single native play, leave the
+        // hand intact and let the legacy path produce its normal fallback.
+        if (!hadPlayableCard || played == 0)
+        {
+            return false;
+        }
+
+        // Match the existing mirror turn contract: cards not selected by the
+        // automatic player are discarded at enemy-turn end.  Powers and
+        // exhausted cards have already left the hand in OnPlayWrapper.
+        foreach (CardModel card in hand.Cards.ToList())
+        {
+            if (!discard.Cards.Contains(card))
+            {
+                await CardPileCmd.Add(card, discard, skipVisuals: true);
+            }
+        }
+
+        return true;
+    }
+
+    private int NativeEnergyRefresh(CardPile hand)
+    {
+        int max = NativeEnergyPerCycle;
+        foreach (CardModel card in hand.Cards)
+        {
+            try
+            {
+                if (!card.EnergyCost.CostsX)
+                {
+                    max = Math.Max(max, card.EnergyCost.GetWithModifiers(CostModifiers.All));
+                }
+            }
+            catch
+            {
+                // Keep the five-energy fallback for cards with unusual costs.
+            }
+        }
+        return Math.Clamp(max, NativeEnergyPerCycle, 99);
+    }
+
+    private bool NativeTargetAvailable(CardModel card, ICombatState combatState)
+    {
+        return card.TargetType switch
+        {
+            TargetType.AnyEnemy => NativeTargetFor(card, combatState) != null,
+            TargetType.AnyAlly => NativeTargetFor(card, combatState) != null,
+            _ => true,
+        };
+    }
+
+    private Creature? NativeTargetFor(CardModel card, ICombatState combatState)
+    {
+        if (card.TargetType == TargetType.AnyEnemy)
+        {
+            // The owner is an enemy-side Creature, so CardCmd's default
+            // HittableEnemies lookup would point back at the mirror.  Pass a
+            // player-side opponent explicitly.
+            return combatState.GetOpponentsOf(Creature)
+                .FirstOrDefault(c => c.IsAlive && c.IsHittable);
+        }
+        if (card.TargetType == TargetType.AnyAlly)
+        {
+            return _mirrorOsty?.IsAlive == true ? _mirrorOsty : Creature;
+        }
+        if (card.TargetType == TargetType.AnyPlayer)
+        {
+            return Creature;
+        }
+        return null;
+    }
+
+    private static async Task MoveNativeFailureToDiscard(CardModel card, CardPile discard)
+    {
+        try
+        {
+            if (card.Pile == null)
+            {
+                await CardPileCmd.Add(card, discard, skipVisuals: true);
+            }
+            else if (card.Pile != discard)
+            {
+                await CardPileCmd.Add(card, discard, skipVisuals: true);
+            }
+        }
+        catch
+        {
+            // A failed card is cosmetic state only; never propagate a second
+            // pile error into CombatManager's turn coroutine.
+        }
     }
 
     private MirrorMoveState BuildTurnMove(MonsterMoveStateMachine machine)
